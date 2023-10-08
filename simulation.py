@@ -29,7 +29,7 @@ class Simulation:
             end_time = time.time()
             delta_time = end_time - start_time
             delay = 1.0 / self.FPS - delta_time
-            time.sleep(delay)
+            time.sleep(max(0, delay))
 
     def stop(self, simulation_result):
         self.running = False

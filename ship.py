@@ -4,7 +4,7 @@ import random
 import time
 import math
 
-from bot import Bot
+from bot import Bot1, Bot2
 from fire import Fire
 from cell_state import CellState
 from task_status import TaskStatus
@@ -20,8 +20,8 @@ class Ship:
         self.init_layout()
         self.bot_location, self.button_location, self.initial_fire_location = self.set_initial_states()
 
-        self.bot = Bot(self, self.bot_location)
         self.fire = Fire(self, self.initial_fire_location, flammability)
+        self.bot = Bot2(self, self.bot_location)
 
     def update(self):
         bot_result = self.bot.update()
@@ -38,18 +38,35 @@ class Ship:
         self.display()
 
     def init_layout(self):
+        print("Generating Ship Layout... Please wait...   ")
+        dot = 0
         initial_cell = (random.randint(0, self.ship_size - 1), random.randint(0, self.ship_size - 1))
         self.open_cell(initial_cell)
-        self.display()
-
-        selected_next_cell = self.get_available_cell()
+        
+        selected_next_cell = self.get_available_cells()
 
         while selected_next_cell is not None:
-            self.open_cell(selected_next_cell)
+            self.open_cell(random.choice(selected_next_cell))
             self.display()
-            # time.sleep(0.3)
 
-            selected_next_cell = self.get_available_cell()
+            selected_next_cell = self.get_available_cells()
+
+            dot += 1
+            if dot % 400 == 0:
+                print("\033[A                           \033[A")
+                print("Generating Ship Layout... Please wait...   ")
+            elif dot % 200 == 0:
+                print("\033[A                           \033[A")
+                print("Generating Ship Layout... Please wait..   ")
+                
+        dead_ends = self.get_dead_end_cells()
+        
+        # for i in range(len(dead_ends)):
+        for i in range(int(len(dead_ends) / 2)):
+            closed_neighbors = self.get_closed_neighbors(dead_ends[i])
+
+            if (closed_neighbors is not None and len(closed_neighbors) > 0):
+                self.open_cell(random.choice(closed_neighbors))
 
 
     def set_initial_states(self):
@@ -71,13 +88,23 @@ class Ship:
 
 
     def open_cell(self, cell):
-        print("Opening cell: ", cell)
+        # print("Opening cell: ", cell)
         self.ship_grid[cell] = CellState.OPENED
-        print(self.ship_grid[cell])
+        # print(self.ship_grid[cell])
         self.opened_cells.add(cell)
 
 
-    def get_available_cell(self):    
+    def get_dead_end_cells(self):
+        # gets all the open cells that have one open neighbor
+        dead_end_cells = []
+
+        for open_cell in self.opened_cells:
+            if len(self.get_opened_neighbors(open_cell)) == 1:
+                dead_end_cells.append(open_cell)
+        
+        return dead_end_cells
+
+    def get_available_cells(self):    
         # get all the neighbors of already opened cells, (since only those who are next to opened cells can have one or more neighbors)
         # do NOT include the opened cells
         # get the ones with one open neighbor
@@ -91,13 +118,20 @@ class Ship:
                     if len(self.get_opened_neighbors(neighbor)) == 1:
                         available_cells.append(neighbor)
 
-        print("Available Cells to open: ", available_cells)
+        # print("Available Cells to open: ", available_cells)
 
         if len(available_cells) == 0:
             return None
 
-        return available_cells[random.randint(0, len(available_cells) - 1)]
+        return available_cells
 
+    def get_closed_neighbors(self, cell):
+        closed_neighbors = []
+        for neighbor in self.get_neighbors(cell):
+            if self.ship_grid[neighbor] == CellState.CLOSED:
+                closed_neighbors.append(neighbor)
+
+        return closed_neighbors
 
     def get_opened_neighbors(self, cell):
         opened_neighbors = []
@@ -138,7 +172,7 @@ class Ship:
             for x in range(len(self.ship_grid[1])):
                 current_cell_display = CellState.to_display_string[self.ship_grid[y, x]]
 
-                
+
 
                 if x == len(self.ship_grid[1]) - 1:
                     current_cell_display += "|"
