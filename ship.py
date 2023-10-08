@@ -4,7 +4,9 @@ import random
 import time
 import math
 
-from bot import Bot1, Bot2
+from bots.bot1 import Bot1
+from bots.bot2 import Bot2
+from bots.bot3 import Bot3
 from fire import Fire
 from cell_state import CellState
 from task_status import TaskStatus
@@ -21,7 +23,7 @@ class Ship:
         self.bot_location, self.button_location, self.initial_fire_location = self.set_initial_states()
 
         self.fire = Fire(self, self.initial_fire_location, flammability)
-        self.bot = Bot2(self, self.bot_location)
+        self.bot = Bot3(self, self.bot_location)
 
     def update(self):
         bot_result = self.bot.update()
@@ -47,7 +49,7 @@ class Ship:
 
         while selected_next_cell is not None:
             self.open_cell(random.choice(selected_next_cell))
-            self.display()
+            # self.display()
 
             selected_next_cell = self.get_available_cells()
 

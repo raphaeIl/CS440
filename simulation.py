@@ -1,5 +1,4 @@
 from ship import *
-from bot import *
 from fire import *
 from task_status import TaskStatus
 
@@ -9,7 +8,7 @@ class Simulation:
 
     def __init__(self, ship_size, ship_flammability):
         self.running = True
-        self.FPS = 1
+        self.FPS = 5
 
         self.ship = Ship(ship_size, ship_flammability) # init ship
 

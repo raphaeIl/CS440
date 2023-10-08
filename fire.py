@@ -53,3 +53,13 @@ class Fire:
                 burning_neighbors.add(neighbor)
 
         return burning_neighbors
+    
+    def get_adjacent_fire_cells(self):
+        adjacent_fire_cells = set()
+
+        for fire_cell in self.fire_cells:
+            for neighbor in self.get_burning_neighbors(fire_cell):
+                if neighbor != fire_cell:
+                    adjacent_fire_cells.add(neighbor)
+
+        return list(adjacent_fire_cells)

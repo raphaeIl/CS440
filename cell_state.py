@@ -6,7 +6,8 @@ class CellState:
     BUTTON = 4
     PATH = 5
     WALKED_PATH = 6
+    OLD_PATH = 7
 
     # to_display_string = ['■', ' ', '🔥', '🤖', '✅']
     # to_display_string = ['■', ' ', 'F', 'B', 'X']
-    to_display_string = ['⬛', '  ', '🔥', '🤖', '🔴', '🟩', '🟦']
+    to_display_string = ['⬛', '  ', '🔥', '🤖', '🔴', '🟩', '🟦', '🟥']
