@@ -4,42 +4,41 @@ import random
 import time
 import math
 
-from bot import *
-from fire import *
-
-class CellState:
-    CLOSED = 0
-    OPENED = 1
-    FIRE = 2
-    BOT = 3
-    BUTTON = 4
+from bot import Bot
+from fire import Fire
+from cell_state import CellState
+from task_status import TaskStatus
 
 class Ship:
     def __init__(self, D, flammability):       
-        self.D = D 
-        self.flammability = flammability
+        self.ship_size = D 
 
         self.ship_grid = np.zeros((D, D), np.int8)
 
         self.opened_cells = set([])
-        self.fire_cells = set([])
 
         self.init_layout()
-        self.bot_location, self.button_location, self.initial_fire_location = self.get_initial_states()
+        self.bot_location, self.button_location, self.initial_fire_location = self.set_initial_states()
 
         self.bot = Bot(self, self.bot_location)
-        self.fire = Fire(self.initial_fire_location)
-
+        self.fire = Fire(self, self.initial_fire_location, flammability)
 
     def update(self):
-        pass
+        bot_result = self.bot.update()
+        fire_result = self.fire.update()
 
-    
+        if (bot_result == TaskStatus.FAIL or fire_result == TaskStatus.FAIL):
+            return TaskStatus.FAIL
+        
+        return bot_result
+            
+     # if both return success, timestep completed sucessfully
+
     def render(self):
         self.display()
 
     def init_layout(self):
-        initial_cell = (random.randint(0, self.D - 1), random.randint(0, self.D - 1))
+        initial_cell = (random.randint(0, self.ship_size - 1), random.randint(0, self.ship_size - 1))
         self.open_cell(initial_cell)
         self.display()
 
@@ -53,22 +52,27 @@ class Ship:
             selected_next_cell = self.get_available_cell()
 
 
-    def get_initial_states(self):
+    def set_initial_states(self):
         states = set([])
 
         while len(states) < 3:
             states.add(random.choice(list(self.opened_cells)))
 
         initial_bot_cell = states.pop()
+        self.ship_grid[initial_bot_cell] = CellState.BOT
+        
         initial_button_cell = states.pop()
+        self.ship_grid[initial_button_cell] = CellState.BUTTON
+        
         initial_fire_cell = states.pop()
+        self.ship_grid[initial_fire_cell] = CellState.FIRE
 
         return initial_bot_cell, initial_button_cell, initial_fire_cell
 
 
     def open_cell(self, cell):
         print("Opening cell: ", cell)
-        self.ship_grid[cell] = self.OPENED
+        self.ship_grid[cell] = CellState.OPENED
         print(self.ship_grid[cell])
         self.opened_cells.add(cell)
 
@@ -98,7 +102,7 @@ class Ship:
     def get_opened_neighbors(self, cell):
         opened_neighbors = []
         for neighbor in self.get_neighbors(cell):
-            if self.ship_grid[neighbor] == self.OPENED:
+            if self.ship_grid[neighbor] != CellState.CLOSED:
                 opened_neighbors.append(neighbor)
 
         return opened_neighbors
@@ -109,9 +113,9 @@ class Ship:
         cell_y = cell[0]
         cell_x = cell[1]
 
-        for y in range(max(0, cell_y - 1), min(cell_y + 2, self.D)):
+        for y in range(max(0, cell_y - 1), min(cell_y + 2, self.ship_size)):
             if (y == cell_y):
-                for x in range(max(0, cell_x - 1), min(cell_x + 2, self.D)):
+                for x in range(max(0, cell_x - 1), min(cell_x + 2, self.ship_size)):
                     neighbors.add((y, x))
 
             neighbors.add((y, cell_x))
@@ -132,12 +136,7 @@ class Ship:
         for y in range(len(self.ship_grid[0])):
             print("|", end='')
             for x in range(len(self.ship_grid[1])):
-                current_cell_display = " "
-
-                if self.ship_grid[y, x] == CellState.CLOSED:
-                    current_cell_display = "■"
-                elif self.ship_grid[y, x] == self.FIRE:
-                    current_cell_display = "F"
+                current_cell_display = CellState.to_display_string[self.ship_grid[y, x]]
 
                 if x == len(self.ship_grid[1]) - 1:
                     current_cell_display += "|"
