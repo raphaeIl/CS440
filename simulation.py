@@ -9,7 +9,7 @@ class Simulation:
 
     def __init__(self, ship_size, ship_flammability):
         self.running = True
-        self.FPS = 10
+        self.FPS = 1
 
         self.ship = Ship(ship_size, ship_flammability) # init ship
 
@@ -37,8 +37,8 @@ class Simulation:
         print("Success!" if simulation_result == TaskStatus.SUCCESS else "Fail")
 
     def update(self): # this update and render are ran once per frame
-        # return self.ship.update()
-        pass
+        return self.ship.update()
 
     def render(self):
         self.ship.render()
+        pass

@@ -128,7 +128,7 @@ class Ship:
     def display(self):
         for x in range(len(self.ship_grid[0])):
             if x == 0:
-                print(" _", end='')
+                print(" __", end='')
             else:
                 print("__", end='')
 
@@ -138,10 +138,12 @@ class Ship:
             for x in range(len(self.ship_grid[1])):
                 current_cell_display = CellState.to_display_string[self.ship_grid[y, x]]
 
+                
+
                 if x == len(self.ship_grid[1]) - 1:
                     current_cell_display += "|"
-                else:
-                    current_cell_display += " "
+                # else:
+                    # current_cell_display += ""
 
                 print(current_cell_display, end="")
 
@@ -149,7 +151,7 @@ class Ship:
 
         for x in range(len(self.ship_grid[0])):
             if x == 0:
-                print(" ‾", end='')
+                print(" ‾‾", end='')
             else:
                 print("‾‾", end='')
 
