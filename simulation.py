@@ -36,8 +36,9 @@ class Simulation:
         print("Success!" if simulation_result == TaskStatus.SUCCESS else "Fail")
 
     def update(self): # this update and render are ran once per frame
-        return self.ship.update()
+        # return self.ship.update()
+        pass
 
     def render(self):
-        self.ship.render()
+        # self.ship.render()
         pass

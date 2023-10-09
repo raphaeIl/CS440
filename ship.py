@@ -7,6 +7,7 @@ import math
 from bots.bot1 import Bot1
 from bots.bot2 import Bot2
 from bots.bot3 import Bot3
+from bots.bot4 import Bot4
 from fire import Fire
 from cell_state import CellState
 from task_status import TaskStatus
@@ -20,10 +21,12 @@ class Ship:
         self.opened_cells = set([])
 
         self.init_layout()
-        self.bot_location, self.button_location, self.initial_fire_location = self.set_initial_states()
 
-        self.fire = Fire(self, self.initial_fire_location, flammability)
-        self.bot = Bot3(self, self.bot_location)
+        self.save_ship_layout()
+        # self.bot_location, self.button_location, self.initial_fire_location = self.set_initial_states()
+
+        # self.fire = Fire(self, self.initial_fire_location, flammability)
+        # self.bot = Bot4(self, self.bot_location)
 
     def update(self):
         bot_result = self.bot.update()
@@ -193,3 +196,16 @@ class Ship:
 
         print()
 
+    def save_ship_layout(self, name):
+        binary_str = ''.join([''.join(map(str, row)) for row in self.ship_grid])
+        int_value = int(binary_str, 2)
+        
+        # Convert integer to bytes
+        byte_length = (int_value.bit_length() + 7) // 8
+        bytes = int_value.to_bytes(byte_length, 'big')
+
+        with open(f"""{}"", 'wb') as f:
+            f.write(bytes)
+
+    def load_ship_layout():
+        pass
