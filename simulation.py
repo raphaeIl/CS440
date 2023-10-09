@@ -6,11 +6,11 @@ import time
 
 class Simulation:
 
-    def __init__(self, ship_size, ship_flammability):
+    def __init__(self, ship_size, ship_flammability, ship_layout_file = None):
         self.running = True
         self.FPS = 5
 
-        self.ship = Ship(ship_size, ship_flammability) # init ship
+        self.ship = Ship(ship_size, ship_flammability, ship_layout_file) # init ship
 
         self.start()
 
@@ -36,9 +36,12 @@ class Simulation:
         print("Success!" if simulation_result == TaskStatus.SUCCESS else "Fail")
 
     def update(self): # this update and render are ran once per frame
-        # return self.ship.update()
+        return self.ship.update()
         pass
 
     def render(self):
-        # self.ship.render()
+        self.ship.render()
         pass
+
+
+# check if no path in the beginning, fire on button, dist from fire to button is longer than dist from robot to button == win

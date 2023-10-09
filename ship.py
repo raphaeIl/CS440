@@ -13,20 +13,27 @@ from cell_state import CellState
 from task_status import TaskStatus
 
 class Ship:
-    def __init__(self, D, flammability):       
+    def __init__(self, D, flammability, load_from_file = None):       
         self.ship_size = D 
 
         self.ship_grid = np.zeros((D, D), np.int8)
 
         self.opened_cells = set([])
+        
+        # for i in range(1, 101): # saving 100 50x50 layouts
+        # self.save_ship_layout(f"layout_{i}")
 
-        self.init_layout()
+        if load_from_file == None:        
+            self.init_layout()
+        else:
+            self.load_ship_layout(load_from_file, D, D)
 
-        self.save_ship_layout()
-        # self.bot_location, self.button_location, self.initial_fire_location = self.set_initial_states()
+        self.bot_location, self.button_location, self.initial_fire_location = self.set_initial_states()
 
-        # self.fire = Fire(self, self.initial_fire_location, flammability)
-        # self.bot = Bot4(self, self.bot_location)
+        self.fire = Fire(self, self.initial_fire_location, flammability)
+        self.bot = Bot4(self, self.bot_location)
+
+    
 
     def update(self):
         bot_result = self.bot.update()
@@ -200,12 +207,23 @@ class Ship:
         binary_str = ''.join([''.join(map(str, row)) for row in self.ship_grid])
         int_value = int(binary_str, 2)
         
-        # Convert integer to bytes
         byte_length = (int_value.bit_length() + 7) // 8
         bytes = int_value.to_bytes(byte_length, 'big')
 
-        with open(f"""{}"", 'wb') as f:
+        with open(f"""saved_ship_layouts/{name}""", 'wb') as f:
             f.write(bytes)
 
-    def load_ship_layout():
-        pass
+    def load_ship_layout(self, name, nrows, ncols):
+        with open(f"""saved_ship_layouts/{name}""", 'rb') as f:        
+            byte_data = f.read()
+        
+        int_value = int.from_bytes(byte_data, 'big')
+        binary_str = bin(int_value)[2:].zfill(nrows * ncols)
+    
+        loaded_layout = np.array([[int(binary_str[i * ncols + j]) for j in range(ncols)] for i in range(nrows)])
+        self.ship_grid = loaded_layout
+
+        for y in range(nrows):
+            for x in range(ncols):
+                if self.ship_grid[y, x] == CellState.OPENED:
+                    self.opened_cells.add((y, x))

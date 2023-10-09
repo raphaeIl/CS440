@@ -1,7 +1,11 @@
 from simulation import Simulation
 
-sim = Simulation(50, 1)
+# run layout files
 
-sim.start()
+
+def run_simulation(ship_size, ship_flammability, saved_ship_layout_file):
+    sim = Simulation(50, 0)
+
+    sim.start()
 
 
