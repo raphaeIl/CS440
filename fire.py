@@ -29,7 +29,8 @@ class Fire:
 
         # get_opened_neighbors of the list of fire cells, repeat step 2
         if random.random() > (1 - pow((1 - self.flammability), len(self.get_burning_neighbors(fire_cell)))):
-            print("Fire failed to spread")
+            # print("Fire failed to spread")
+            pass
         else:
             if fire_cell == self.ship.button_location or fire_cell == self.ship.bot_location:
                 return TaskStatus.FAIL
@@ -39,7 +40,7 @@ class Fire:
         return TaskStatus.ONGOING
 
     def set_cell_fire(self, cell):
-        print("Setting cell on fire: ", cell)
+        # print("Setting cell on fire: ", cell)
         self.ship.ship_grid[cell] = CellState.FIRE
 
         self.fire_cells.add(cell)

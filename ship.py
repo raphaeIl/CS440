@@ -1,8 +1,5 @@
-# D x D np array
 import numpy as np
 import random
-import time
-import math
 
 from bots.bot1 import Bot1
 from bots.bot2 import Bot2
@@ -13,7 +10,7 @@ from cell_state import CellState
 from task_status import TaskStatus
 
 class Ship:
-    def __init__(self, D, flammability, load_from_file = None):       
+    def __init__(self, D, flammability, bot_number, load_from_file = None):       
         self.ship_size = D 
 
         self.ship_grid = np.zeros((D, D), np.int8)
@@ -31,9 +28,17 @@ class Ship:
         self.bot_location, self.button_location, self.initial_fire_location = self.set_initial_states()
 
         self.fire = Fire(self, self.initial_fire_location, flammability)
-        self.bot = Bot4(self, self.bot_location)
 
-    
+        if bot_number == 1:
+            self.bot = Bot1(self, self.bot_location)
+        elif bot_number == 2:
+            self.bot = Bot2(self, self.bot_location)
+        elif bot_number == 3:
+            self.bot = Bot3(self, self.bot_location)
+        elif bot_number == 4:
+            self.bot = Bot4(self, self.bot_location)
+
+        print("Running Simulation....")
 
     def update(self):
         bot_result = self.bot.update()

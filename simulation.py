@@ -6,13 +6,12 @@ import time
 
 class Simulation:
 
-    def __init__(self, ship_size, ship_flammability, ship_layout_file = None):
+    def __init__(self, ship_size, ship_flammability, bot_number, ship_layout_file = None, render_debug_logs = False):
         self.running = True
         self.FPS = 5
+        self.render_debug_logs = render_debug_logs
 
-        self.ship = Ship(ship_size, ship_flammability, ship_layout_file) # init ship
-
-        self.start()
+        self.ship = Ship(ship_size, ship_flammability, bot_number, ship_layout_file) # init ship
 
     def start(self): # Starts Game Loop
         while self.running:
@@ -22,7 +21,8 @@ class Simulation:
 
             if result != TaskStatus.ONGOING:
                 self.stop(result)
-            
+                return result
+
             self.render()
 
             end_time = time.time()
@@ -33,15 +33,17 @@ class Simulation:
     def stop(self, simulation_result):
         self.running = False
 
-        print("Success!" if simulation_result == TaskStatus.SUCCESS else "Fail")
+        if self.render_debug_logs:
+            print("Success!" if simulation_result == TaskStatus.SUCCESS else "Fail")
 
     def update(self): # this update and render are ran once per frame
         return self.ship.update()
-        pass
 
     def render(self):
+        if not self.render_debug_logs:
+            return
+
         self.ship.render()
-        pass
 
 
 # check if no path in the beginning, fire on button, dist from fire to button is longer than dist from robot to button == win

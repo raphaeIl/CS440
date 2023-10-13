@@ -11,14 +11,16 @@ class Bot4:
 
         self.ship.opened_cells.remove(self.ship.initial_fire_location)
 
-        print(initial_location, self.ship.button_location)
+        # print(initial_location, self.ship.button_location)
 
         self.path = self.find_shortest_path(initial_location, self.ship.button_location) # check here first path invalod
-        # move to render for other bots
-        for i in range(1, len(self.path) - 1): # solely used for displaying to console for fun, no actual functional uses
-            self.ship.ship_grid[self.path[i]] = CellState.PATH
 
-        print(self.path)
+        # no path lose
+        # move to render for other bots
+        # for i in range(1, len(self.path) - 1): # solely used for displaying to console for fun, no actual functional uses
+            # self.ship.ship_grid[self.path[i]] = CellState.PATH
+
+        # print(self.path)
 
 
     def find_shortest_path(self, start, destination): # A*
@@ -47,43 +49,14 @@ class Bot4:
 
                 heapq.heappush(heapQueue, (f, neighbor, path + [current]))
 
-        return None
 
-    def find_sh2ortest_path(self, start, destination):
-        # element: (nodeValue, cost/priority, path)
-        queue = deque([(start, [])])
-        visited = set()
+        # if no path can be found, try again without taking into account of the adjcent fire cells
+        while heapQueue:
+            # Get the node in open_list having the lowest f (g + h) value.
+            _, current, path = heapq.heappop(heapQueue)
 
-        while len(queue) > 0:
-            # find node with shortest distance (highest priority)
-            current = queue[0]
-
-            for node in queue:
-                if node[1] < current[1]:
-                    current = node
-            
-            node, cost, path = current
-
-            queue.remove(current)
-            visited.add(node)
-
-
-            if node == destination:
-                return path + [node]
-
-            for neighbor in self.ship.get_opened_neighbors(node):
-                if neighbor in visited or neighbor in self.ship.fire.fire_cells or neighbor in self.ship.fire.get_adjacent_fire_cells():
-                    continue
-                
-                new_distance = cost + self.heuristic(current, neighbor)
-
-                if (new_distance < neighbor):
-                    pass
-
-                queue.append((neighbor, path + [current]))
-
-        while len(queue) > 0:
-            current, path = queue.popleft()
+            if current in visited:
+                continue
 
             visited.add(current)
 
@@ -94,7 +67,11 @@ class Bot4:
                 if neighbor in visited or neighbor in self.ship.fire.fire_cells:
                     continue
 
-                queue.append((neighbor, path + [current]))
+                g = len(path) + 1  # distance from start to current node
+                h = self.heuristic(neighbor, destination)  # h cost
+                f = g + h
+
+                heapq.heappush(heapQueue, (f, neighbor, path + [current]))
 
         return None
 
@@ -130,7 +107,7 @@ class Bot4:
 
         self.location = destination
         self.ship.ship_grid[destination] = CellState.BOT
-        print(self.ship.ship_grid[destination])
+        # print(self.ship.ship_grid[destination])
 
     
     def heuristic(self, a, b): # Manhattan Distance

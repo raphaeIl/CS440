@@ -10,14 +10,14 @@ class Bot3:
 
         self.ship.opened_cells.remove(self.ship.initial_fire_location)
 
-        print(initial_location, self.ship.button_location)
+        # print(initial_location, self.ship.button_location)
 
         self.path = self.find_shortest_path(initial_location, self.ship.button_location) # check here first path invalod
         # move to render for other bots
         for i in range(1, len(self.path) - 1): # solely used for displaying to console for fun, no actual functional uses
             self.ship.ship_grid[self.path[i]] = CellState.PATH
 
-        print(self.path)
+        # print(self.path)
 
     def find_shortest_path(self, start, destination):
         queue = deque([(start, [])])
@@ -85,4 +85,4 @@ class Bot3:
 
         self.location = destination
         self.ship.ship_grid[destination] = CellState.BOT
-        print(self.ship.ship_grid[destination])
+        # print(self.ship.ship_grid[destination])

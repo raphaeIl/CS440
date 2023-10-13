@@ -23,4 +23,4 @@ Steps:
 3. Task End Detection (sucess - bot arrives at button, fail - fire spread to bot/no path available)
     if bot reaches button, success
     if fire is at same location as bot, fail
-    if no path is avaiable, fail
+    if no path is avaiable, faile
