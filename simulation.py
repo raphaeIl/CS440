@@ -14,6 +14,9 @@ class Simulation:
         self.ship = Ship(ship_size, ship_flammability, bot_number, ship_layout_file) # init ship
 
     def start(self): # Starts Game Loop
+        if self.ship.start() == TaskStatus.FAIL:
+            return TaskStatus.FAIL
+
         while self.running:
             start_time = time.time()
 
@@ -44,6 +47,3 @@ class Simulation:
             return
 
         self.ship.render()
-
-
-# check if no path in the beginning, fire on button, dist from fire to button is longer than dist from robot to button == win

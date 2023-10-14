@@ -10,15 +10,12 @@ from cell_state import CellState
 from task_status import TaskStatus
 
 class Ship:
-    def __init__(self, D, flammability, bot_number, load_from_file = None):       
+    def __init__(self, D, flammability, bot_number, load_from_file = None):         
         self.ship_size = D 
 
         self.ship_grid = np.zeros((D, D), np.int8)
 
         self.opened_cells = set([])
-        
-        # for i in range(1, 101): # saving 100 50x50 layouts
-        # self.save_ship_layout(f"layout_{i}")
 
         if load_from_file == None:        
             self.init_layout()
@@ -26,6 +23,7 @@ class Ship:
             self.load_ship_layout(load_from_file, D, D)
 
         self.bot_location, self.button_location, self.initial_fire_location = self.set_initial_states()
+        self.opened_cells.remove(self.initial_fire_location)
 
         self.fire = Fire(self, self.initial_fire_location, flammability)
 
@@ -39,6 +37,12 @@ class Ship:
             self.bot = Bot4(self, self.bot_location)
 
         print("Running Simulation....")
+
+    def start(self):
+        start_status = self.bot.start()
+
+        if start_status == TaskStatus.FAIL: # instant fail, no path available
+            return TaskStatus.FAIL
 
     def update(self):
         bot_result = self.bot.update()
@@ -85,7 +89,6 @@ class Ship:
             if (closed_neighbors is not None and len(closed_neighbors) > 0):
                 self.open_cell(random.choice(closed_neighbors))
 
-
     def set_initial_states(self):
         states = set([])
 
@@ -103,13 +106,11 @@ class Ship:
 
         return initial_bot_cell, initial_button_cell, initial_fire_cell
 
-
     def open_cell(self, cell):
         # print("Opening cell: ", cell)
         self.ship_grid[cell] = CellState.OPENED
         # print(self.ship_grid[cell])
         self.opened_cells.add(cell)
-
 
     def get_dead_end_cells(self):
         # gets all the open cells that have one open neighbor
@@ -157,7 +158,6 @@ class Ship:
                 opened_neighbors.append(neighbor)
 
         return opened_neighbors
-    
 
     def get_neighbors(self, cell):
         neighbors = set([])
@@ -174,7 +174,6 @@ class Ship:
         neighbors.remove(cell)
 
         return neighbors
-
 
     def display(self):
         for x in range(len(self.ship_grid[0])):
@@ -207,6 +206,18 @@ class Ship:
                 print("‾‾", end='')
 
         print()
+
+    def pre_generate_layouts(self, layout_count, layout_size):
+        for i in range(1, layout_count + 1): # saving 100 50x50 layouts
+
+            self.ship_size = layout_size
+
+            self.ship_grid = np.zeros((self.ship_size, self.ship_size), np.int8)
+
+            self.opened_cells = set([])
+
+            self.init_layout()
+            self.save_ship_layout(f"layout_{i}")
 
     def save_ship_layout(self, name):
         binary_str = ''.join([''.join(map(str, row)) for row in self.ship_grid])
