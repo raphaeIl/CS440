@@ -7,20 +7,20 @@ import random
 
 from bot import Bot
 
-class Bot1(Bot):
+class Bot3(Bot):
 
     def start(self):
         start_status = super().start()
 
 
         # all cells might have leak
-        self.leak_probability_grid = np.ones((self.ship.ship_size, self.ship.ship_size), np.int8)
+        self.leak_probability_grid = np.zeros((self.ship.ship_size, self.ship.ship_size), np.int8)
 
         # walls can not have leaks
         for y in range(0, self.ship.ship_size):
             for x in range(0, self.ship.ship_size):
-                if (y, x) not in self.ship.opened_cells:
-                    self.leak_probability_grid[y, x] = 0
+                if (y, x) in self.ship.opened_cells:
+                    self.leak_probability_grid[y, x] = 1 / len(self.ship.opened_cells)
         
         self.sense()
 

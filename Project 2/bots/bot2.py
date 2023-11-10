@@ -7,10 +7,11 @@ import random
 
 from bot import Bot
 
-class Bot1(Bot):
+class Bot2(Bot):
 
     def start(self):
         start_status = super().start()
+        self.current_path = deque()
 
 
         # all cells might have leak
@@ -54,27 +55,39 @@ class Bot1(Bot):
             self.leak_probability_grid[start_y:end_y, start_x:end_x] = 0
         return sensed_leak
     
- 
+    # instead of moving to path destination directly
+    # sense at each step of the path and if destination changes, move towards that instead
+
+    
     def update(self):
         super().update()
 
         sensed_leak = self.sense()
-        print(sensed_leak)
-        
+
         nearest_cell = self.find_nearest_cell()
-        path = self.find_shortest_path(self.location, nearest_cell)
-        print(self.location, nearest_cell, path)
-        for next_cell in path:
 
-            if (self.ship.ship_grid[next_cell] == CellState.LEAK):
-                return TaskStatus.SUCCESS
+        # 0 means reached destination
+        if len(self.current_path) == 0:
+            path = self.find_shortest_path(self.location, nearest_cell)
+            self.current_path.extend(path)
 
-            self.leak_probability_grid[next_cell] = 0
-            self.move(next_cell)
-
-        # if no leak, move to highest % neighbor
-        # if leak 
         self.render_probability_grid()
+        
+        last_destination = self.current_path[len(self.current_path) - 1]
+        # if new destination for nearest cell found, 
+        if nearest_cell != last_destination and \
+            self.manhattan_distance(self.location, nearest_cell) < self.manhattan_distance(self.location, last_destination):
+            self.current_path = deque()
+            return TaskStatus.ONGOING
+
+        # move to next location in path, if leak sucess if not set prob 0
+        next_cell  = self.current_path.popleft()
+
+        if (self.ship.ship_grid[next_cell] == CellState.LEAK):
+            return TaskStatus.SUCCESS
+
+        self.leak_probability_grid[next_cell] = 0
+        self.move(next_cell)
 
         return TaskStatus.ONGOING
 

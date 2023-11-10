@@ -2,6 +2,8 @@ import numpy as np
 import random
 
 from bots.bot1 import Bot1
+from bots.bot2 import Bot2
+from bots.bot3 import Bot3
 from cell_state import CellState
 from task_status import TaskStatus
 
@@ -21,10 +23,10 @@ class Ship:
 
         if bot_number == 1:
             self.bot = Bot1(self, self.bot_location, self.detection_radius)
-        # # elif bot_number == 2:
-        # #     self.bot = Bot2(self, self.bot_location)
-        # # elif bot_number == 3:
-        # #     self.bot = Bot3(self, self.bot_location)
+        elif bot_number == 2:
+            self.bot = Bot2(self, self.bot_location, self.detection_radius)
+        elif bot_number == 3:
+            self.bot = Bot3(self, self.bot_location, self.detection_radius)
         # # elif bot_number == 4:
         # #     self.bot = Bot4(self, self.bot_location)
         # self.bot = Bot1()
