@@ -24,7 +24,7 @@ class Bot1(Bot):
         
         self.sense()
 
-    def sense(self):
+    def sense(self): # sense and update knownledge
         # if sensed and no leak, mark everything in area 0
         # if sensed and leak, mark everything in area that are not 0 to 0.5 (possible), and everything outside 0
         # if only one 1 left, that must be leak
@@ -60,7 +60,6 @@ class Bot1(Bot):
 
         sensed_leak = self.sense()
         print(sensed_leak)
-        self.render_probability_grid()
         
         nearest_cell = self.find_nearest_cell()
         path = self.find_shortest_path(self.location, nearest_cell)
@@ -75,6 +74,8 @@ class Bot1(Bot):
 
         # if no leak, move to highest % neighbor
         # if leak 
+        self.render_probability_grid()
+
         return TaskStatus.ONGOING
 
     def find_nearest_cell(self):

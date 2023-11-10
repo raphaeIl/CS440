@@ -33,6 +33,8 @@ class Simulation:
             delay = 1.0 / self.FPS - delta_time
             time.sleep(max(0, delay))
 
+            # input()
+
     def stop(self, simulation_result):
         self.running = False
 

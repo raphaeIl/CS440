@@ -33,6 +33,7 @@ class Ship:
 
     def start(self):
         self.bot.start()
+        self.render()
 
     def update(self):
         bot_result = self.bot.update()
