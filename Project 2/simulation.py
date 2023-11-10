@@ -1,17 +1,16 @@
 from ship import *
-from fire import *
 from task_status import TaskStatus
 
 import time
 
 class Simulation:
 
-    def __init__(self, ship_size, ship_flammability, bot_number, ship_layout_file = None, render_debug_logs = False):
+    def __init__(self, ship_size, detection_radius, bot_number, ship_layout_file = None, render_debug_logs = False):
         self.running = True
         self.FPS = 100
         self.render_debug_logs = render_debug_logs
 
-        self.ship = Ship(ship_size, ship_flammability, bot_number, ship_layout_file) # init ship
+        self.ship = Ship(ship_size, detection_radius, bot_number, ship_layout_file) # init ship
 
     def start(self): # Starts Game Loop
         if self.ship.start() == TaskStatus.FAIL:
@@ -25,6 +24,7 @@ class Simulation:
             if result != TaskStatus.ONGOING:
                 self.stop(result)
                 return result
+            print("result", result)
 
             self.render()
 

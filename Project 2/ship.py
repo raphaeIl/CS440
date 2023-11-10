@@ -2,19 +2,14 @@ import numpy as np
 import random
 
 from bots.bot1 import Bot1
-from bots.bot2 import Bot2
-from bots.bot3 import Bot3
-from bots.bot4 import Bot4
-from fire import Fire
 from cell_state import CellState
 from task_status import TaskStatus
 
 class Ship:
-    def __init__(self, D, flammability, bot_number, load_from_file = None):         
+    def __init__(self, D, detection_radius, bot_number, load_from_file = None):         
         self.ship_size = D 
-
+        self.detection_radius = detection_radius
         self.ship_grid = np.zeros((D, D), np.int8)
-
         self.opened_cells = set([])
 
         if load_from_file == None:        
@@ -22,39 +17,31 @@ class Ship:
         else:
             self.load_ship_layout(load_from_file, D, D)
 
-        self.bot_location, self.button_location, self.initial_fire_location = self.set_initial_states()
-        self.opened_cells.remove(self.initial_fire_location)
-
-        self.fire = Fire(self, self.initial_fire_location, flammability)
+        self.bot_location, self.leak_location = self.set_initial_states()
 
         if bot_number == 1:
-            self.bot = Bot1(self, self.bot_location)
-        elif bot_number == 2:
-            self.bot = Bot2(self, self.bot_location)
-        elif bot_number == 3:
-            self.bot = Bot3(self, self.bot_location)
-        elif bot_number == 4:
-            self.bot = Bot4(self, self.bot_location)
+            self.bot = Bot1(self, self.bot_location, self.detection_radius)
+        # # elif bot_number == 2:
+        # #     self.bot = Bot2(self, self.bot_location)
+        # # elif bot_number == 3:
+        # #     self.bot = Bot3(self, self.bot_location)
+        # # elif bot_number == 4:
+        # #     self.bot = Bot4(self, self.bot_location)
+        # self.bot = Bot1()
 
         print("Running Simulation....")
 
     def start(self):
-        start_status = self.bot.start()
-
-        if start_status == TaskStatus.FAIL: # instant fail, no path available
-            return TaskStatus.FAIL
+        self.bot.start()
 
     def update(self):
         bot_result = self.bot.update()
-        fire_result = self.fire.update()
 
-        if (bot_result == TaskStatus.FAIL or fire_result == TaskStatus.FAIL):
-            return TaskStatus.FAIL
+        if bot_result == TaskStatus.SUCCESS:
+            return TaskStatus.SUCCESS
         
-        return bot_result
-            
-     # if both return success, timestep completed sucessfully
-
+        return TaskStatus.ONGOING
+                
     def render(self):
         self.display()
 
@@ -89,22 +76,34 @@ class Ship:
             if (closed_neighbors is not None and len(closed_neighbors) > 0):
                 self.open_cell(random.choice(closed_neighbors))
 
+    # detects if leak is in an area, given center and radius
+    def is_leak_in_area(self, area_center, area_radius):
+        return self.location_is_in_square(self.leak_location, area_center, area_radius)
+
+    # tuples (y, x)                                     k
+    def location_is_in_square(self, location, square_center, radius):
+            return square_center[0] - radius <= location[0] <= square_center[0] + radius and \
+                    square_center[1] - radius <= location[1] <= square_center[1] + radius  
+        
+
     def set_initial_states(self):
-        states = set([])
-
-        while len(states) < 3:
-            states.add(random.choice(list(self.opened_cells)))
-
-        initial_bot_cell = states.pop()
+        initial_bot_cell = random.choice(list(self.opened_cells))
         self.ship_grid[initial_bot_cell] = CellState.BOT
         
-        initial_button_cell = states.pop()
-        self.ship_grid[initial_button_cell] = CellState.BUTTON
-        
-        initial_fire_cell = states.pop()
-        self.ship_grid[initial_fire_cell] = CellState.FIRE
+        opened_cells_outside_detection_square = [cell for cell in self.opened_cells if not self.location_is_in_square(cell, initial_bot_cell, self.detection_radius)]
 
-        return initial_bot_cell, initial_button_cell, initial_fire_cell
+        # display purposes, detection square
+        for open_cell in self.opened_cells:
+            if self.location_is_in_square(open_cell, initial_bot_cell, self.detection_radius) and open_cell != initial_bot_cell:
+                # if abs(open_cell[0] - initial_bot_cell[0] == self.detection_radius) or abs(open_cell[1] - initial_bot_cell[1] == self.detection_radius):
+                self.ship_grid[open_cell] = CellState.DETECTION_SQUARE
+
+        initial_leak_cell = random.choice(opened_cells_outside_detection_square)
+        self.ship_grid[initial_leak_cell] = CellState.LEAK
+        
+        return initial_bot_cell, initial_leak_cell
+
+    
 
     def open_cell(self, cell):
         # print("Opening cell: ", cell)
