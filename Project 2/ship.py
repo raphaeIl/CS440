@@ -6,6 +6,7 @@ from bots.bot2 import Bot2
 from bots.bot3 import Bot3
 from bots.bot4 import Bot4
 from bots.bot5 import Bot5
+from bots.bot6 import Bot6
 from cell_state import CellState
 from task_status import TaskStatus
 
@@ -35,7 +36,9 @@ class Ship:
             self.bot = Bot4(self, self.bot_location, self.detection_radius)
         elif bot_number == 5:
             self.bot = Bot5(self, self.bot_location, self.detection_radius)
-
+        elif bot_number == 6:
+            self.bot = Bot5(self, self.bot_location, self.detection_radius)
+        
         print("Running Simulation....")
 
     def start(self):
