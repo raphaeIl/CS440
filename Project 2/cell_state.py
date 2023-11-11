@@ -15,7 +15,7 @@ class CellState:
     to_probability_display_string = {
         -1: '⬛', # wall
         0: '🟥',  # 0% possiblity of containing leak
-        1.5: '🟨', 
+        0.5: '🟨', 
         1: '🟩',
         999: '🟦'
     }

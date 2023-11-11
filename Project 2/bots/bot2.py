@@ -12,6 +12,7 @@ class Bot2(Bot):
     def start(self):
         start_status = super().start()
         self.current_path = deque()
+        self.total_actions = 0
 
 
         # all cells might have leak
@@ -29,6 +30,7 @@ class Bot2(Bot):
         # if sensed and no leak, mark everything in area 0
         # if sensed and leak, mark everything in area that are not 0 to 0.5 (possible), and everything outside 0
         # if only one 1 left, that must be leak
+        self.total_actions += 1
         sensed_leak = self.ship.is_leak_in_area(self.location, self.detection_radius)
         
         # detection square
@@ -84,28 +86,60 @@ class Bot2(Bot):
         next_cell  = self.current_path.popleft()
 
         if (self.ship.ship_grid[next_cell] == CellState.LEAK):
+            print("Total actions: ", self.total_actions)
             return TaskStatus.SUCCESS
 
         self.leak_probability_grid[next_cell] = 0
         self.move(next_cell)
+        self.total_actions += 1
 
         return TaskStatus.ONGOING
 
     def find_nearest_cell(self):
-        # print(self.leak_probability_grid)
+        # for all max prob, find the local prob of that cell and use that as the max
+        # regardless of distance
         max_probability = self.leak_probability_grid.max()
 
         # print(max_probability)
         max_probability_cells = []
-
+ 
         for y in range(0, self.ship.ship_size):
             for x in range(0, self.ship.ship_size):
                 if self.leak_probability_grid[y, x] == max_probability and (y, x) != self.location and (y, x) in self.ship.opened_cells:
                     max_probability_cells.append((y, x))
         
         distances = [self.manhattan_distance(self.location, cell) for cell in max_probability_cells]
+        
+        local_probs = []
 
-        min_distance_cell = max_probability_cells[np.argmin(distances)]
+        # detection square
+        for max_prob_cell in max_probability_cells:
+            start_y, end_y, start_x, end_x = \
+                max(0, max_prob_cell[0] - self.detection_radius), \
+                min(self.ship.ship_size - 1, max_prob_cell[0] + self.detection_radius), \
+                max(0, max_prob_cell[1] - self.detection_radius), \
+                min(self.ship.ship_size - 1, max_prob_cell[1] + self.detection_radius)
+        
+            local_prob = self.leak_probability_grid[start_y:end_y, start_x:end_x].sum()
+            local_probs.append(local_prob)
+
+        # print(max_probability_cells)
+        # print(local_probs)
+
+        max_local_probability = max(local_probs)
+        max_local_prob_cells = []
+
+        for i in range(0, len(local_probs)):
+            if local_probs[i] == max_local_probability:
+                max_local_prob_cells.append(max_probability_cells[i])
+
+
+        print(max_local_prob_cells)
+        print(max_local_probability)
+
+        return random.choice(max_local_prob_cells)
+
+        # min_distance_cell = max_probability_cells[np.argmin(distances)]
         # random
 
         # print(min_distance_cell, self.manhattan_distance(self.location, min_distance_cell))
@@ -114,7 +148,7 @@ class Bot2(Bot):
         # find all their distances
         # find the path to the nearest and moves towards
 
-        return min_distance_cell
+        # return min_distance_cell
 
     def render_probability_grid(self):
             for x in range(len(self.leak_probability_grid[0])):

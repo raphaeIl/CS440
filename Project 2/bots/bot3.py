@@ -4,77 +4,127 @@ from task_status import TaskStatus
 from collections import deque
 import numpy as np
 import random
-
+import math
 from bot import Bot
-
 class Bot3(Bot):
 
     def start(self):
         start_status = super().start()
-
+        self.current_path = deque()
+        self.total_actions = 0
 
         # all cells might have leak
-        self.leak_probability_grid = np.zeros((self.ship.ship_size, self.ship.ship_size), np.int8)
+        self.leak_probability_grid = np.zeros((self.ship.ship_size, self.ship.ship_size), np.float16)
 
         # walls can not have leaks
         for y in range(0, self.ship.ship_size):
             for x in range(0, self.ship.ship_size):
                 if (y, x) in self.ship.opened_cells:
                     self.leak_probability_grid[y, x] = 1 / len(self.ship.opened_cells)
+                    print(1 / len(self.ship.opened_cells))
         
-        self.sense()
+        # self.sense()
+        print(self.leak_probability_grid)
+        
+        # input()
 
     def sense(self): # sense and update knownledge
-        # if sensed and no leak, mark everything in area 0
-        # if sensed and leak, mark everything in area that are not 0 to 0.5 (possible), and everything outside 0
-        # if only one 1 left, that must be leak
-        sensed_leak = self.ship.is_leak_in_area(self.location, self.detection_radius)
-        
-        # detection square
-        start_y, end_y, start_x, end_x = \
-            max(0, self.location[0] - self.detection_radius), \
-            min(self.ship.ship_size - 1, self.location[0] + self.detection_radius), \
-            max(0, self.location[1] - self.detection_radius), \
-            min(self.ship.ship_size - 1, self.location[1] + self.detection_radius)
+        # beep or not
+        self.total_actions += 1
+        alpha = 0.5
+        d = len(self.find_shortest_path(self.location, self.ship.leak_location)) # only using the leak location to find out if beep or not, 
+        probability_equation = math.pow(math.e, -alpha * (d - 1))
 
-        if sensed_leak:
-            for y in range(0, self.ship.ship_size):
-                for x in range(0, self.ship.ship_size):
-                    if (y, x) not in self.ship.opened_cells:
-                        continue
+        # P(beep in i)
+        beep_in_i = 0
+        for y in range(self.ship.ship_size):
+            for x in range(self.ship.ship_size):
+                if (y, x) in self.ship.opened_cells:
+                    beep_in_i += self.leak_probability_grid[y, x] * math.pow(math.e, -alpha * (len(self.find_shortest_path(self.location, (y, x))) - 1))
 
-                    if self.ship.location_is_in_square((y, x), self.location, self.detection_radius):
-                        if self.leak_probability_grid[y, x] != 0:
-                            self.leak_probability_grid[y, x] = 1
-                    else:
-                        self.leak_probability_grid[y, x] = 0
+        print("P(beep in i)", beep_in_i)
 
-
+        if random.random() < probability_equation: 
+            # beep
+            for y in range(self.ship.ship_size):
+                for x in range(self.ship.ship_size):
+                    # Find P( leak in cell j | heard a beep in cell i )
+                    # = P(leak in j) (original prob in leak_probability_grid) * probability_equation / P(beep in i)
+                    # P(beep in i)
+                    if (y, x) != self.location and (y, x) in self.ship.opened_cells:
+                        self.leak_probability_grid[y, x] = self.leak_probability_grid[y, x] * \
+                            math.pow(math.e, -alpha * (len(self.find_shortest_path(self.location, (y, x))) - 1)) / \
+                                beep_in_i
         else:
-            self.leak_probability_grid[start_y:end_y, start_x:end_x] = 0
-        return sensed_leak
-    
+            # no beep
+            for y in range(self.ship.ship_size):
+                for x in range(self.ship.ship_size):
+                    # Find P( leak in cell j | heard a beep in cell i )
+                    # = P(leak in j) (original prob in leak_probability_grid) * probability_equation / P(beep in i)
+                    # P(no beep in i)
+                    if (y, x) != self.location and (y, x) in self.ship.opened_cells:
+                        self.leak_probability_grid[y, x] = self.leak_probability_grid[y, x] * \
+                            (1 - math.pow(math.e, -alpha * (len(self.find_shortest_path(self.location, (y, x))) - 1))) / \
+                               (1 - beep_in_i)
+
  
     def update(self):
         super().update()
 
-        sensed_leak = self.sense()
-        print(sensed_leak)
+        # find all cells with highest probability
+        # get distance of all, find shortest
+
+        # if destination is different from preivous, change path
+
+        # start moving towards it
+        # if no leak at current cell, sense
+
+        # sensed_leak = self.sense()
+        # print(sensed_leak)
         
         nearest_cell = self.find_nearest_cell()
-        path = self.find_shortest_path(self.location, nearest_cell)
-        print(self.location, nearest_cell, path)
-        for next_cell in path:
 
-            if (self.ship.ship_grid[next_cell] == CellState.LEAK):
-                return TaskStatus.SUCCESS
+        # 0 means reached destination
+        if len(self.current_path) == 0:
+            path = self.find_shortest_path(self.location, nearest_cell)
+            self.current_path.extend(path)
 
-            self.leak_probability_grid[next_cell] = 0
-            self.move(next_cell)
-
-        # if no leak, move to highest % neighbor
-        # if leak 
         self.render_probability_grid()
+        
+        last_destination = self.current_path[len(self.current_path) - 1]
+        # if new destination for nearest cell found, 
+        if nearest_cell != last_destination and \
+            self.manhattan_distance(self.location, nearest_cell) < self.manhattan_distance(self.location, last_destination):
+            self.current_path = deque()
+            return TaskStatus.ONGOING
+
+        # move to next location in path, if leak sucess if not set prob 0
+        next_cell  = self.current_path.popleft()
+
+        if (self.ship.ship_grid[next_cell] == CellState.LEAK):
+            print("Total actions: ", self.total_actions)
+            return TaskStatus.SUCCESS
+        
+        # update P(current) and P(all others) same?
+        print("sum of all probability before:", self.leak_probability_grid.sum())
+
+        # for y in range(self.ship.ship_size):
+        #     for x in range(self.ship.ship_size):
+        #         if (y, x) != next_cell:
+        #             self.leak_probability_grid[y, x] = self.leak_probability_grid[y, x] / (self.leak_probability_grid[next_cell])
+        self.leak_probability_grid[next_cell] = 0
+
+        # total_probability = np.sum(self.leak_probability_grid)
+        
+        # if total_probability > 0:
+            # self.leak_probability_grid /= total_probability
+
+        print("sum of all probability after:", self.leak_probability_grid.sum())
+        self.move(next_cell)
+        self.total_actions += 1
+        self.sense()
+
+        print(self.leak_probability_grid)
 
         return TaskStatus.ONGOING
 
@@ -114,7 +164,16 @@ class Bot3(Bot):
             for y in range(len(self.leak_probability_grid[0])):
                 print("|", end='')
                 for x in range(len(self.leak_probability_grid[1])):
-                    current_cell_display = CellState.to_probability_display_string[self.leak_probability_grid[y, x]]
+                    p = self.leak_probability_grid[y, x]
+                    key = 0
+                    if 0 <= p <= 0.333333:
+                        key = 0
+                    elif 0.3333333 < p <= 0.6666666:
+                        key = 0.5
+                    elif 0.6666666 < p <= 1:
+                        key = 1
+
+                    current_cell_display = CellState.to_probability_display_string[key]
 
 
 

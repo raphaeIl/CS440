@@ -11,7 +11,7 @@ class Bot1(Bot):
 
     def start(self):
         start_status = super().start()
-
+        self.total_actions = 0
 
         # all cells might have leak
         self.leak_probability_grid = np.ones((self.ship.ship_size, self.ship.ship_size), np.int8)
@@ -29,7 +29,8 @@ class Bot1(Bot):
         # if sensed and leak, mark everything in area that are not 0 to 0.5 (possible), and everything outside 0
         # if only one 1 left, that must be leak
         sensed_leak = self.ship.is_leak_in_area(self.location, self.detection_radius)
-        
+        self.total_actions += 1
+
         # detection square
         start_y, end_y, start_x, end_x = \
             max(0, self.location[0] - self.detection_radius), \
@@ -52,6 +53,7 @@ class Bot1(Bot):
 
         else:
             self.leak_probability_grid[start_y:end_y, start_x:end_x] = 0
+
         return sensed_leak
     
  
@@ -67,10 +69,13 @@ class Bot1(Bot):
         for next_cell in path:
 
             if (self.ship.ship_grid[next_cell] == CellState.LEAK):
+                print("Total actions: ", self.total_actions)
                 return TaskStatus.SUCCESS
 
             self.leak_probability_grid[next_cell] = 0
             self.move(next_cell)
+            self.total_actions += 1
+
 
         # if no leak, move to highest % neighbor
         # if leak 
