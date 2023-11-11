@@ -7,7 +7,7 @@ import random
 import math
 import heapq
 from bot import Bot
-class Bot3(Bot):
+class Bot4(Bot):
 
     def start(self):
         start_status = super().start()
@@ -119,20 +119,48 @@ class Bot3(Bot):
         return TaskStatus.ONGOING
 
     def find_nearest_cell(self):
-        # print(self.leak_probability_grid)
+        # for all max prob, find the local prob of that cell and use that as the max
+        # regardless of distance
         max_probability = self.leak_probability_grid.max()
 
         # print(max_probability)
         max_probability_cells = []
-
+ 
         for y in range(0, self.ship.ship_size):
             for x in range(0, self.ship.ship_size):
                 if self.leak_probability_grid[y, x] == max_probability and (y, x) != self.location and (y, x) in self.ship.opened_cells:
                     max_probability_cells.append((y, x))
         
-        distances = [self.manhattan_distance(self.location, cell) for cell in max_probability_cells]
+        local_probs = []
 
-        min_distance_cell = max_probability_cells[np.argmin(distances)]
+        # detection square
+        for max_prob_cell in max_probability_cells:
+            start_y, end_y, start_x, end_x = \
+                max(0, max_prob_cell[0] - self.detection_radius), \
+                min(self.ship.ship_size - 1, max_prob_cell[0] + self.detection_radius), \
+                max(0, max_prob_cell[1] - self.detection_radius), \
+                min(self.ship.ship_size - 1, max_prob_cell[1] + self.detection_radius)
+        
+            local_prob = self.leak_probability_grid[start_y:end_y, start_x:end_x].sum()
+            local_probs.append(local_prob)
+
+        # print(max_probability_cells)
+        # print(local_probs)
+
+        max_local_probability = max(local_probs)
+        max_local_prob_cells = []
+
+        for i in range(0, len(local_probs)):
+            if local_probs[i] == max_local_probability:
+                max_local_prob_cells.append(max_probability_cells[i])
+
+
+        print(max_local_prob_cells)
+        print(max_local_probability)
+
+        return random.choice(max_local_prob_cells)
+
+        # min_distance_cell = max_probability_cells[np.argmin(distances)]
         # random
 
         # print(min_distance_cell, self.manhattan_distance(self.location, min_distance_cell))
@@ -141,7 +169,7 @@ class Bot3(Bot):
         # find all their distances
         # find the path to the nearest and moves towards
 
-        return min_distance_cell
+        # return min_distance_cell
 
     def render_probability_grid(self):
             for x in range(len(self.leak_probability_grid[0])):

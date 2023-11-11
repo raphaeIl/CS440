@@ -4,6 +4,8 @@ import random
 from bots.bot1 import Bot1
 from bots.bot2 import Bot2
 from bots.bot3 import Bot3
+from bots.bot4 import Bot4
+from bots.bot5 import Bot5
 from cell_state import CellState
 from task_status import TaskStatus
 
@@ -27,8 +29,8 @@ class Ship:
             self.bot = Bot2(self, self.bot_location, self.detection_radius)
         elif bot_number == 3:
             self.bot = Bot3(self, self.bot_location, self.detection_radius)
-        # # elif bot_number == 4:
-        # #     self.bot = Bot4(self, self.bot_location)
+        elif bot_number == 4:
+            self.bot = Bot4(self, self.bot_location, self.detection_radius)
         # self.bot = Bot1()
 
         print("Running Simulation....")

@@ -17,7 +17,7 @@ result = run_simulation(
     amount=1, # number of simulations to run
     ship_size=20, # (D value)
     detection_radius=3, # (k value)
-    bot_number=2, # Bot1, Bot2, Bot3 or Bot4?
+    bot_number=4, # Bot1, Bot2, Bot3 or Bot4?
     saved_ship_layout_file=None, # Use pre-generated ship layouts? (there is a 100 50x50 layouts in the saved_ship_layouts folder). Example: saved_ship_layout_file="layout_69"
     render_debug_logs=True, # displays a cute emoji representation of the simulation in the console ^v^
     # (best viewed in the visual studio code terminal, other terminals might mess up the formatting)
