@@ -21,7 +21,9 @@ class Ship:
         else:
             self.load_ship_layout(load_from_file, D, D)
 
-        self.bot_location, self.leak_location = self.set_initial_states()
+        handle_multiple_leaks = bot_number >= 5
+
+        self.bot_location, self.leak_location, self.leak_location2 = self.set_initial_states(handle_multiple_leaks)
 
         if bot_number == 1:
             self.bot = Bot1(self, self.bot_location, self.detection_radius)
@@ -31,7 +33,8 @@ class Ship:
             self.bot = Bot3(self, self.bot_location, self.detection_radius)
         elif bot_number == 4:
             self.bot = Bot4(self, self.bot_location, self.detection_radius)
-        # self.bot = Bot1()
+        elif bot_number == 5:
+            self.bot = Bot5(self, self.bot_location, self.detection_radius)
 
         print("Running Simulation....")
 
@@ -83,7 +86,8 @@ class Ship:
 
     # detects if leak is in an area, given center and radius
     def is_leak_in_area(self, area_center, area_radius):
-        return self.location_is_in_square(self.leak_location, area_center, area_radius)
+        return (self.leak_location != None and self.location_is_in_square(self.leak_location, area_center, area_radius)) or \
+            (self.leak_location2 != None and self.location_is_in_square(self.leak_location2, area_center, area_radius))
 
     # tuples (y, x)                                     k
     def location_is_in_square(self, location, square_center, radius):
@@ -91,7 +95,7 @@ class Ship:
                     square_center[1] - radius <= location[1] <= square_center[1] + radius  
         
 
-    def set_initial_states(self):
+    def set_initial_states(self, handle_multiple_leaks):
         initial_bot_cell = random.choice(list(self.opened_cells))
         self.ship_grid[initial_bot_cell] = CellState.BOT
         
@@ -106,7 +110,15 @@ class Ship:
         initial_leak_cell = random.choice(opened_cells_outside_detection_square)
         self.ship_grid[initial_leak_cell] = CellState.LEAK
         
-        return initial_bot_cell, initial_leak_cell
+        opened_cells_outside_detection_square.remove(initial_leak_cell)
+
+        initial_leak_cell2 = None
+
+        if handle_multiple_leaks:
+            initial_leak_cell2 = random.choice(opened_cells_outside_detection_square)
+            self.ship_grid[initial_leak_cell2] = CellState.LEAK
+
+        return initial_bot_cell, initial_leak_cell, initial_leak_cell2
 
     
 
