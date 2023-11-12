@@ -41,7 +41,9 @@ class Bot3(Bot):
         for y in range(self.ship.ship_size):
             for x in range(self.ship.ship_size):
                 if (y, x) in self.ship.opened_cells:
-                    beep_in_i += self.leak_probability_grid[y, x] * math.pow(math.e, -alpha * (len(self.find_shortest_path(self.location, (y, x))) - 1))
+                    prob = self.leak_probability_grid[y, x] * math.pow(math.e, -alpha * (len(self.find_shortest_path(self.location, (y, x))) - 1))
+                    beep_in_i += prob
+                    print(prob)
 
         # print("P(beep in i)", beep_in_i)
 

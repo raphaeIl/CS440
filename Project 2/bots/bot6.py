@@ -13,8 +13,13 @@ class Bot6(Bot):
         start_status = super().start()
         self.current_path = deque()
         self.total_actions = 0
+        self.leaks_found = 0
 
+        self.init_probability_grid()
+        
+        self.sense()
 
+    def init_probability_grid(self):
         # all cells might have leak
         self.leak_probability_grid = np.ones((self.ship.ship_size, self.ship.ship_size), np.int8)
 
@@ -23,8 +28,6 @@ class Bot6(Bot):
             for x in range(0, self.ship.ship_size):
                 if (y, x) not in self.ship.opened_cells:
                     self.leak_probability_grid[y, x] = 0
-        
-        self.sense()
 
     def sense(self): # sense and update knownledge
         # if sensed and no leak, mark everything in area 0
