@@ -12,7 +12,6 @@ class Bot4(Bot):
     def start(self):
         start_status = super().start()
         self.current_path = deque()
-        self.total_actions = 0
 
         # all cells might have leak
         self.leak_probability_grid = np.zeros((self.ship.ship_size, self.ship.ship_size), np.float16)
@@ -31,7 +30,6 @@ class Bot4(Bot):
 
     def sense(self): # sense and update knownledge
         # beep or not
-        self.total_actions += 1
         alpha = 0.5
         d = len(self.find_shortest_path(self.location, self.ship.leak_location)) # only using the leak location to find out if beep or not, 
         probability_equation = math.pow(math.e, -alpha * (d - 1))
@@ -111,7 +109,6 @@ class Bot4(Bot):
 
         # print("sum of all probability after:", self.leak_probability_grid.sum())
         self.move(next_cell)
-        self.total_actions += 1
         self.sense()
 
         # print(self.leak_probability_grid)

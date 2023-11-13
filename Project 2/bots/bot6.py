@@ -12,7 +12,6 @@ class Bot6(Bot):
     def start(self):
         start_status = super().start()
         self.current_path = deque()
-        self.total_actions = 0
         self.leaks_found = 0
 
         self.init_probability_grid()
@@ -33,7 +32,6 @@ class Bot6(Bot):
         # if sensed and no leak, mark everything in area 0
         # if sensed and leak, mark everything in area that are not 0 to 0.5 (possible), and everything outside 0
         # if only one 1 left, that must be leak
-        self.total_actions += 1
         sensed_leak = self.ship.is_leak_in_area(self.location, self.detection_radius)
         
         # detection square
@@ -104,7 +102,6 @@ class Bot6(Bot):
             
         self.leak_probability_grid[next_cell] = 0
         self.move(next_cell)
-        self.total_actions += 1
 
         return TaskStatus.ONGOING
 

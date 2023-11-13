@@ -11,7 +11,6 @@ class Bot5(Bot):
 
     def start(self):
         start_status = super().start()
-        self.total_actions = 0
         self.leaks_found = 0
 
         self.init_probability_grid()
@@ -33,7 +32,6 @@ class Bot5(Bot):
         # if sensed and leak, mark everything in area that are not 0 to 0.5 (possible), and everything outside 0
         # if only one 1 left, that must be leak
         sensed_leak = self.ship.is_leak_in_area(self.location, self.detection_radius)
-        self.total_actions += 1
 
         # detection square
         start_y, end_y, start_x, end_x = \
@@ -89,7 +87,6 @@ class Bot5(Bot):
             self.leak_probability_grid[next_cell] = 0
             self.ship.ship_grid[next_cell] = CellState.OPENED
             self.move(next_cell)
-            self.total_actions += 1
 
 
         # if no leak, move to highest % neighbor

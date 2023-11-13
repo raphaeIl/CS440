@@ -9,6 +9,9 @@ class CellState:
     OLD_PATH = 7
     DETECTION_SQUARE = 8
 
+    P_NO_LEAK = 0
+    P_MIGHT_CONTAIN_PEAK = 1
+
     # to_display_string = ['■', ' ', '🔥', '🤖', '✅']
     # to_display_string = ['■', ' ', 'F', 'B', 'X']
     to_display_string = ['⬛', '  ', '💧', '🤖', '🔴', '🟩', '🟦', '🟥', '🟨']

@@ -12,7 +12,6 @@ class Bot7(Bot):
     def start(self):
         start_status = super().start()
         self.current_path = deque()
-        self.total_actions = 0
         self.leaks_found = 0
         # all cells might have leak
         self.init_probability_grid()
@@ -34,30 +33,20 @@ class Bot7(Bot):
 
     def sense(self): # sense and update knownledge
         # beep or not
-        self.total_actions += 1
         alpha = 0.5
+
+        p_leak1 = 0
+        p_leak2 = 0
 
         if self.ship.leak_location != None:
             d1 = len(self.find_shortest_path(self.location, self.ship.leak_location)) # only using the leak location to find out if beep or not, 
-        else:
-            d1 = 0
+            p_leak1 = math.pow(math.e, -alpha * (d1 - 1))
+
 
         if self.ship.leak_location2 != None: 
             d2 = len(self.find_shortest_path(self.location, self.ship.leak_location2)) # only using the leak location to find out if beep or not, 
-        else:
-            d2 = 0
-
-        p_leak1 = math.pow(math.e, -alpha * (d1 - 1))
-        p_leak2 = math.pow(math.e, -alpha * (d2 - 1))
+            p_leak2 = math.pow(math.e, -alpha * (d2 - 1))
         
-        
-        combined_probability_equation = p_leak1 * p_leak2
-
-        print("combined: ", combined_probability_equation)
-
-        probability_equation = combined_probability_equation
-        # probability_equation = math.pow(math.e, -alpha * (d1 - 1))
-
         # P(beep in i)
         beep_in_i = 0
         for y in range(self.ship.ship_size):
@@ -76,7 +65,7 @@ class Bot7(Bot):
             for x in range(self.ship.ship_size):
                 if (y, x) != self.location and (y, x) in self.ship.opened_cells:
                     shortest_distance = len(self.find_shortest_path(self.location, (y, x)))
-                    if random.random() < probability_equation: # beep
+                    if random.random() <= p_leak1 or random.random() <= p_leak2: # beep
                         self.leak_probability_grid[y, x] *= math.pow(math.e, -alpha * (shortest_distance - 1)) / beep_in_i
                     else: # no beep
                         self.leak_probability_grid[y, x] *= (1 - math.pow(math.e, -alpha * (shortest_distance - 1))) / (1 - beep_in_i)
@@ -145,7 +134,6 @@ class Bot7(Bot):
 
         # print("sum of all probability after:", self.leak_probability_grid.sum())
         self.move(next_cell)
-        self.total_actions += 1
         self.sense()
 
         # print(self.leak_probability_grid)
