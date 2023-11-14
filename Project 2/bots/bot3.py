@@ -6,12 +6,13 @@ import numpy as np
 import random
 import math
 import heapq
+
 from bot import Bot
+
 class Bot3(Bot):
 
     def start(self):
-        start_status = super().start()
-        self.current_path = deque()
+        super().start()
 
         # all cells might have leak
         self.leak_probability_grid = np.zeros((self.ship.ship_size, self.ship.ship_size), np.float16)
@@ -21,14 +22,12 @@ class Bot3(Bot):
             for x in range(0, self.ship.ship_size):
                 if (y, x) in self.ship.opened_cells:
                     self.leak_probability_grid[y, x] = 1 / len(self.ship.opened_cells)
-                    print(1 / len(self.ship.opened_cells))
         
-        # self.sense()
-        print(self.leak_probability_grid)
-        
-        # input()
+        self.sense()
+
 
     def sense(self): # sense and update knownledge
+        super().sense()
         # beep or not
         alpha = 0.5
         d = len(self.find_shortest_path(self.location, self.ship.leak_location)) # only using the leak location to find out if beep or not, 
@@ -41,12 +40,9 @@ class Bot3(Bot):
                 if (y, x) in self.ship.opened_cells:
                     prob = self.leak_probability_grid[y, x] * math.pow(math.e, -alpha * (len(self.find_shortest_path(self.location, (y, x))) - 1))
                     beep_in_i += prob
-                    print(prob)
 
         # Find P( leak in cell j | heard a beep in cell i )
         # = P(leak in j) (original prob in leak_probability_grid) * probability_equation / P(beep in i)
-
-        # P(beep in i)
         for y in range(self.ship.ship_size):
             for x in range(self.ship.ship_size):
                 if (y, x) != self.location and (y, x) in self.ship.opened_cells:
@@ -56,90 +52,57 @@ class Bot3(Bot):
                     else: # no beep
                         self.leak_probability_grid[y, x] *= (1 - math.pow(math.e, -alpha * (shortest_distance - 1))) / (1 - beep_in_i)
 
- 
+    
+    def bot_enters_cell_probability_update(self):
+        for y in range(0, self.ship.ship_size):
+            for x in range(0, self.ship.ship_size):
+                if (y, x) in self.ship.opened_cells and (y, x) != self.location:
+                    self.leak_probability_grid[y, x] /= (1 - self.leak_probability_grid[self.location])
+
+        self.leak_probability_grid[self.location] = 0
+
     def update(self):
         super().update()
 
-        # find all cells with highest probability
-        # get distance of all, find shortest
-
-        # if destination is different from preivous, change path
-
-        # start moving towards it
-        # if no leak at current cell, sense
-
-        # sensed_leak = self.sense()
-        # print(sensed_leak)
-        
-        nearest_cell = self.find_nearest_cell()
-
-        # 0 means reached destination
-        if len(self.current_path) == 0:
-            path = self.find_shortest_path(self.location, nearest_cell)
-            self.current_path.extend(path)
-
-        self.render_probability_grid()
-        
-        last_destination = self.current_path[len(self.current_path) - 1]
-        # if new destination for nearest cell found, 
-        if nearest_cell != last_destination and \
-            self.manhattan_distance(self.location, nearest_cell) < self.manhattan_distance(self.location, last_destination):
-            self.current_path = deque()
-            return TaskStatus.ONGOING
-
-        # move to next location in path, if leak sucess if not set prob 0
-        next_cell  = self.current_path.popleft()
-
-        if (self.ship.ship_grid[next_cell] == CellState.LEAK):
-            print("Total actions: ", self.total_actions)
-            return TaskStatus.SUCCESS
-        
-        # update P(current) and P(all others) same?
-        # print("sum of all probability before:", self.leak_probability_grid.sum())
-
-        # for y in range(self.ship.ship_size):
-        #     for x in range(self.ship.ship_size):
-        #         if (y, x) != next_cell:
-        #             self.leak_probability_grid[y, x] = self.leak_probability_grid[y, x] / (self.leak_probability_grid[next_cell])
-        self.leak_probability_grid[next_cell] = 0
-
-        # total_probability = np.sum(self.leak_probability_grid)
-        
-        # if total_probability > 0:
-            # self.leak_probability_grid /= total_probability
-
-        # print("sum of all probability after:", self.leak_probability_grid.sum())
-        self.move(next_cell)
+        self.bot_enters_cell_probability_update()
         self.sense()
+        
+        next_location = self.find_highest_probability_cell()
+        path = self.find_shortest_path(self.location, next_location)
+        
+        for next_cell in path:
+            if (self.ship.ship_grid[next_cell] == CellState.LEAK):
+                return TaskStatus.SUCCESS, self.total_actions
 
-        # print(self.leak_probability_grid)
+            self.move(next_cell)
+            self.bot_enters_cell_probability_update()
 
-        return TaskStatus.ONGOING
+            print(self.leak_probability_grid)
 
-    def find_nearest_cell(self):
-        # print(self.leak_probability_grid)
+        return TaskStatus.ONGOING, -1
+
+    # find the cell that has the highest probability of containing the leak
+    def find_highest_probability_cell(self):
         max_probability = self.leak_probability_grid.max()
-
-        # print(max_probability)
-        max_probability_cells = []
+        max_probability_cells = [] # all cells with the highest probability
 
         for y in range(0, self.ship.ship_size):
             for x in range(0, self.ship.ship_size):
                 if self.leak_probability_grid[y, x] == max_probability and (y, x) != self.location and (y, x) in self.ship.opened_cells:
                     max_probability_cells.append((y, x))
         
-        distances = [self.manhattan_distance(self.location, cell) for cell in max_probability_cells]
+        # breaking ties by distance
+        distances = [len(self.find_shortest_path(self.location, cell)) for cell in max_probability_cells]
+        min_distance = min(distances)
+        closest_cells = []
 
-        min_distance_cell = max_probability_cells[np.argmin(distances)]
-        # random
+        for i in range(0, len(distances)):
+            if distances[i] == min_distance:
+                closest_cells.append(max_probability_cells[i])
+        
+        print(max_probability, min_distance, closest_cells)
 
-        # print(min_distance_cell, self.manhattan_distance(self.location, min_distance_cell))
-        # get max probability
-        # get all cells with that porbability in a list
-        # find all their distances
-        # find the path to the nearest and moves towards
-
-        return min_distance_cell
+        return random.choice(closest_cells) # chose one within all the cells with same distance
 
     def render_probability_grid(self):
             for x in range(len(self.leak_probability_grid[0])):
@@ -154,11 +117,11 @@ class Bot3(Bot):
                 for x in range(len(self.leak_probability_grid[1])):
                     p = self.leak_probability_grid[y, x]
                     key = 0
-                    if 0 <= p <= 0.333333:
+                    if 0 <= p <= 0.001:
                         key = 0
-                    elif 0.3333333 < p <= 0.6666666:
+                    elif 0.001 < p <= 0.002:
                         key = 0.5
-                    elif 0.6666666 < p <= 1:
+                    elif 0.003 < p <= 1:
                         key = 1
 
                     current_cell_display = CellState.to_probability_display_string[key]
@@ -169,59 +132,3 @@ class Bot3(Bot):
                     print(current_cell_display, end="")
 
                 print()
-
-    
-    def manhattan_distance(self, a, b): # Manhattan Distance
-        return abs(a[0] - b[0]) + abs(a[1] - b[1])
-    
-    def find_shortest_path(self, start, destination): # A*
-        super().find_shortest_path(start, destination)
-        heapQueue = [(0, start, [])]  # Priority queue: (f, current_position, path)
-        visited = set()
-
-        while heapQueue:
-            # Get the node in open_list having the lowest f (g + h) value.
-            _, current, path = heapq.heappop(heapQueue)
-
-            if current in visited:
-                continue
-
-            visited.add(current)
-            if current == destination:
-                return path + [current]
-
-            for neighbor in self.ship.get_opened_neighbors(current):
-                if neighbor in visited:
-                    continue
-
-                g = len(path) + 1  # distance from start to current node
-                h = self.heuristic(neighbor, destination)  # h cost
-                f = g + h
-
-                heapq.heappush(heapQueue, (f, neighbor, path + [current]))
-
-        return None
-
-    def heuristic(self, a, b): # Manhattan Distance
-        return abs(a[0] - b[0]) + abs(a[1] - b[1])
-
-    def find_shordest_path(self, start, destination):
-        super().find_shortest_path(start, destination)
-        queue = deque([(start, [])])
-        visited = set()
-
-        while len(queue) > 0:
-            current, path = queue.popleft()
-
-            visited.add(current)
-
-            if current == destination:
-                return path + [current]
-
-            for neighbor in self.ship.get_opened_neighbors(current):
-                if neighbor in visited:
-                    continue
-
-                queue.append((neighbor, path + [current]))
-
-        return None
