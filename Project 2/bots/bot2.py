@@ -159,50 +159,6 @@ class Bot2(Bot):
 
         return final_min_distance_cell
     
-        # def find_nearest_cell(self):
-        # # instead of moving to the nearest single cell that might contain the leak, I will move to the area that has the most cells that might contain the leak
-        # max_probability = CellState.P_MIGHT_CONTAIN_PEAK # max probability for any cell is 1 (since this probability matrix is binary, either contain or does not contain leak)
-        # max_probability_cells = []
-
-        # # find all cells with max prob (ignoring the current one the bot is in and all walls)
-        # for y in range(0, self.ship.ship_size):
-        #     for x in range(0, self.ship.ship_size):
-        #         if self.leak_probability_grid[y, x] == max_probability and (y, x) != self.location and (y, x) in self.ship.opened_cells:
-        #             max_probability_cells.append((y, x))
-
-        # # finding the max local probability, which for the local prob of a cell, i'm just adding up all the cells in the detection area, higher the sum, more cells in that areas possibly contain the leak 
-        # max_local_probability = 0
-
-        # for max_probability_cell in max_probability_cells:
-        #     start_y, end_y, start_x, end_x = max(0, max_probability_cell[0] - self.detection_radius), min(self.ship.ship_size, max_probability_cell[0] + self.detection_radius + 1), max(0, max_probability_cell[1] - self.detection_radius), min(self.ship.ship_size, max_probability_cell[1] + self.detection_radius + 1)
-        #     local_probability = self.leak_probability_grid[start_y:end_y, start_x:end_x].sum()
-        #     if local_probability > max_local_probability:
-        #         max_local_probability = local_probability
-
-
-        # # find all cell that has the max local probability amount the max single ones
-        # max_local_probability_cells = []
-
-        # for max_probability_cell in max_probability_cells:
-        #     start_y, end_y, start_x, end_x = max(0, max_probability_cell[0] - self.detection_radius), min(self.ship.ship_size, max_probability_cell[0] + self.detection_radius + 1), max(0, max_probability_cell[1] - self.detection_radius), min(self.ship.ship_size, max_probability_cell[1] + self.detection_radius + 1)            
-        #     local_probability = self.leak_probability_grid[start_y:end_y, start_x:end_x].sum()
-        #     if local_probability == max_local_probability:
-        #         max_local_probability_cells.append(max_probability_cell)
-    
-
-        # # in case that there is multiple ones with the max probability, choose the nearest one by distance
-        # distances = []
-
-        # for cell in max_local_probability_cells:
-        #     shortest_path = self.find_shortest_path(self.location, cell)
-
-        #     distances.append(len(shortest_path))
-
-        # min_distance_cell = max_local_probability_cells[np.argmin(distances)]
-
-        # return min_distance_cell
-
-
     def render_probability_grid(self):
             for x in range(len(self.leak_probability_grid[0])):
                 if x == 0:

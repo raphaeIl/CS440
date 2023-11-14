@@ -7,8 +7,9 @@ class Simulation:
 
     def __init__(self, ship_size, detection_radius, bot_number, ship_layout_file = None, render_debug_logs = False):
         self.running = True
-        self.FPS = 10000
+        self.FPS = 100000
         self.render_debug_logs = render_debug_logs
+        self.time_elapsed = 0
 
         self.ship = Ship(ship_size, detection_radius, bot_number, ship_layout_file) # init ship
 
@@ -18,7 +19,7 @@ class Simulation:
         if self.render_debug_logs:
             self.ship.render()
 
-        while self.running:
+        while self.running :
             start_time = time.time()
 
             status, result = self.update()
@@ -26,11 +27,16 @@ class Simulation:
             if status != TaskStatus.ONGOING:
                 self.stop(result)
                 return result
+            
+            if self.time_elapsed > 10:
+                self.stop(result)
+                return TaskStatus.FAIL
 
             self.render()
 
             end_time = time.time()
             delta_time = end_time - start_time
+            self.time_elapsed += delta_time
             delay = 1.0 / self.FPS - delta_time
             time.sleep(max(0, delay))
 

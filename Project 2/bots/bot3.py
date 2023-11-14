@@ -77,8 +77,6 @@ class Bot3(Bot):
             self.move(next_cell)
             self.bot_enters_cell_probability_update()
 
-            print(self.leak_probability_grid)
-
         return TaskStatus.ONGOING, -1
 
     # find the cell that has the highest probability of containing the leak
@@ -100,8 +98,6 @@ class Bot3(Bot):
             if distances[i] == min_distance:
                 closest_cells.append(max_probability_cells[i])
         
-        print(max_probability, min_distance, closest_cells)
-
         return random.choice(closest_cells) # chose one within all the cells with same distance
 
     def render_probability_grid(self):
