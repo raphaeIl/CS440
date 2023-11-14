@@ -9,7 +9,7 @@ from bot import Bot
 class Bot1(Bot):
 
     def start(self):
-        start_status = super().start()
+        super().start()
 
         # all cells might have leak at start
         self.leak_probability_grid = np.ones((self.ship.ship_size, self.ship.ship_size), np.int8)
@@ -53,19 +53,15 @@ class Bot1(Bot):
 
         for next_cell in path:
             if (self.ship.ship_grid[next_cell] == CellState.LEAK):
-                print("Total actions: ", self.total_actions)
-                return TaskStatus.SUCCESS
+                return TaskStatus.SUCCESS, self.total_actions
 
             self.leak_probability_grid[next_cell] = 0
             self.move(next_cell)
 
-
-        self.render_probability_grid()
-
-        return TaskStatus.ONGOING
+        return TaskStatus.ONGOING, -1
 
     def find_nearest_cell(self):
-        max_probability = CellState.P_MIGHT_CONTAIN_PEAK # max probability for any cell is 1 (since this probability matrix is binary, either contain or does not contain leak)
+        max_probability = CellState.P_MIGHT_CONTAIN_LEAK # max probability for any cell is 1 (since this probability matrix is binary, either contain or does not contain leak)
         max_probability_cells = []
 
         # find all cells with max prob (ignoring the current one the bot is in and all walls)

@@ -46,18 +46,15 @@ class Ship:
 
     def start(self):
         self.bot.start()
-        self.render()
 
     def update(self):
         bot_result = self.bot.update()
 
-        if bot_result == TaskStatus.SUCCESS:
-            return TaskStatus.SUCCESS
-        
-        return TaskStatus.ONGOING
+        return bot_result
                 
     def render(self):
         self.display()
+        self.bot.render_probability_grid()
 
     def init_layout(self):
         print("Generating Ship Layout... Please wait...   ")

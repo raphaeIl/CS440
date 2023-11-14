@@ -13,18 +13,19 @@ class Simulation:
         self.ship = Ship(ship_size, detection_radius, bot_number, ship_layout_file) # init ship
 
     def start(self): # Starts Game Loop
-        if self.ship.start() == TaskStatus.FAIL:
-            return TaskStatus.FAIL
+        self.ship.start()
+
+        if self.render_debug_logs:
+            self.ship.render()
 
         while self.running:
             start_time = time.time()
 
-            result = self.update() # if update returns a fail status, this will be false
+            status, result = self.update()
 
-            if result != TaskStatus.ONGOING:
+            if status != TaskStatus.ONGOING:
                 self.stop(result)
                 return result
-            print("result", result)
 
             self.render()
 
@@ -37,9 +38,6 @@ class Simulation:
 
     def stop(self, simulation_result):
         self.running = False
-
-        if self.render_debug_logs:
-            print("Success!" if simulation_result == TaskStatus.SUCCESS else "Fail")
 
     def update(self): # this update and render are ran once per frame
         return self.ship.update()

@@ -10,7 +10,7 @@ class CellState:
     DETECTION_SQUARE = 8
 
     P_NO_LEAK = 0
-    P_MIGHT_CONTAIN_PEAK = 1
+    P_MIGHT_CONTAIN_LEAK = 1
 
     # to_display_string = ['■', ' ', '🔥', '🤖', '✅']
     # to_display_string = ['■', ' ', 'F', 'B', 'X']
