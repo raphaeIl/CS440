@@ -7,7 +7,7 @@ class Simulation:
 
     def __init__(self, ship_size, detection_radius, bot_number, ship_layout_file = None, render_debug_logs = False):
         self.running = True
-        self.FPS = 100000
+        self.FPS = 1000
         self.render_debug_logs = render_debug_logs
         self.time_elapsed = 0
 
