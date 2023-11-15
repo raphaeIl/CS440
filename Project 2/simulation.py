@@ -28,7 +28,7 @@ class Simulation:
                 self.stop(result)
                 return result
             
-            if self.time_elapsed > 10:
+            if self.time_elapsed > 10:  # 10s timeout incase something happens
                 self.stop(result)
                 return TaskStatus.FAIL
 
