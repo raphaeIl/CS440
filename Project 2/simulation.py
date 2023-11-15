@@ -5,13 +5,13 @@ import time
 
 class Simulation:
 
-    def __init__(self, ship_size, detection_radius, bot_number, ship_layout_file = None, render_debug_logs = False):
+    def __init__(self, ship_size, detection_radius, alpha, bot_number, ship_layout_file = None, render_debug_logs = False):
         self.running = True
-        self.FPS = 1000
+        self.FPS = 100000000000
         self.render_debug_logs = render_debug_logs
         self.time_elapsed = 0
 
-        self.ship = Ship(ship_size, detection_radius, bot_number, ship_layout_file) # init ship
+        self.ship = Ship(ship_size, detection_radius, alpha, bot_number, ship_layout_file) # init ship
 
     def start(self): # Starts Game Loop
         self.ship.start()
@@ -28,7 +28,7 @@ class Simulation:
                 self.stop(result)
                 return result
             
-            if self.time_elapsed > 10:  # 10s timeout incase something happens
+            if self.time_elapsed > 60:  # 10s timeout incase something happens
                 self.stop(result)
                 return TaskStatus.FAIL
 

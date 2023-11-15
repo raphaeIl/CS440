@@ -8,11 +8,13 @@ from bots.bot4 import Bot4
 from bots.bot5 import Bot5
 from bots.bot6 import Bot6
 from bots.bot7 import Bot7
+from bots.bot8 import Bot8
 from cell_state import CellState
 from task_status import TaskStatus
 
 class Ship:
-    def __init__(self, D, detection_radius, bot_number, load_from_file = None):         
+    def __init__(self, D, detection_radius, alpha, bot_number, load_from_file = None): 
+        return        
         self.ship_size = D 
         self.detection_radius = detection_radius
         self.ship_grid = np.zeros((D, D), np.int8)
@@ -23,6 +25,7 @@ class Ship:
         else:
             self.load_ship_layout(load_from_file, D, D)
 
+
         handle_multiple_leaks = bot_number >= 5
 
         self.bot_location, self.leak_location, self.leak_location2 = self.set_initial_states(handle_multiple_leaks)
@@ -32,15 +35,17 @@ class Ship:
         elif bot_number == 2:
             self.bot = Bot2(self, self.bot_location, self.detection_radius)
         elif bot_number == 3:
-            self.bot = Bot3(self, self.bot_location, self.detection_radius)
+            self.bot = Bot3(self, self.bot_location, self.detection_radius, alpha)
         elif bot_number == 4:
-            self.bot = Bot4(self, self.bot_location, self.detection_radius)
+            self.bot = Bot4(self, self.bot_location, self.detection_radius, alpha)
         elif bot_number == 5:
             self.bot = Bot5(self, self.bot_location, self.detection_radius)
         elif bot_number == 6:
             self.bot = Bot6(self, self.bot_location, self.detection_radius)
         elif bot_number == 7:
-            self.bot = Bot7(self, self.bot_location, self.detection_radius)
+            self.bot = Bot7(self, self.bot_location, self.detection_radius, alpha)
+        elif bot_number == 8:
+            self.bot = Bot8(self, self.bot_location, self.detection_radius, alpha)
         
         print("Running Simulation....")
 

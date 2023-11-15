@@ -14,7 +14,14 @@ class Bot(ABC):
         self.detection_radius = detection_radius
         self.total_actions = 0
 
-        # self.path = self.find_shortest_path(initial_location, self.ship.button_location)
+    def __init__(self, ship, initial_location, detection_radius, alpha):
+        """Initializes basic variables for all bots"""
+        self.ship = ship
+        self.location = initial_location
+        self.detection_radius = detection_radius
+        self.alpha = alpha
+        self.total_actions = 0
+
     
     @abstractmethod
     def start(self):

@@ -27,26 +27,25 @@ class Bot7(Bot):
 
     def sense(self): # sense and update knownledge
         # beep or not
-        alpha = 0.5
 
         p_leak1 = 0
         p_leak2 = 0
 
         if self.ship.leak_location != None:
             d1 = len(self.find_shortest_path(self.location, self.ship.leak_location)) # only using the leak location to find out if beep or not, 
-            p_leak1 = math.pow(math.e, -alpha * (d1 - 1))
+            p_leak1 = math.pow(math.e, -self.alpha * (d1 - 1))
 
 
         if self.ship.leak_location2 != None: 
             d2 = len(self.find_shortest_path(self.location, self.ship.leak_location2)) # only using the leak location to find out if beep or not, 
-            p_leak2 = math.pow(math.e, -alpha * (d2 - 1))
+            p_leak2 = math.pow(math.e, -self.alpha * (d2 - 1))
         
         # P(beep in i)
         beep_in_i = 0
         for y in range(self.ship.ship_size):
             for x in range(self.ship.ship_size):
                 if (y, x) in self.ship.opened_cells:
-                    prob = self.leak_probability_grid[y, x] * math.pow(math.e, -alpha * (len(self.find_shortest_path(self.location, (y, x))) - 1))
+                    prob = self.leak_probability_grid[y, x] * math.pow(math.e, -self.alpha * (len(self.find_shortest_path(self.location, (y, x))) - 1))
                     beep_in_i += prob
                     # print(prob)
 
@@ -60,9 +59,9 @@ class Bot7(Bot):
                 if (y, x) != self.location and (y, x) in self.ship.opened_cells:
                     shortest_distance = len(self.find_shortest_path(self.location, (y, x)))
                     if random.random() <= p_leak1 or random.random() <= p_leak2: # beep
-                        self.leak_probability_grid[y, x] *= math.pow(math.e, -alpha * (shortest_distance - 1)) / beep_in_i
+                        self.leak_probability_grid[y, x] *= math.pow(math.e, -self.alpha * (shortest_distance - 1)) / beep_in_i
                     else: # no beep
-                        self.leak_probability_grid[y, x] *= (1 - math.pow(math.e, -alpha * (shortest_distance - 1))) / (1 - beep_in_i)
+                        self.leak_probability_grid[y, x] *= (1 - math.pow(math.e, -self.alpha * (shortest_distance - 1))) / (1 - beep_in_i)
 
     def bot_enters_cell_probability_update(self):
         for y in range(0, self.ship.ship_size):
