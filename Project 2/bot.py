@@ -7,14 +7,7 @@ import heapq
 
 # Abstract class for Bots to create the structure of all bots
 class Bot(ABC):
-    def __init__(self, ship, initial_location, detection_radius):
-        """Initializes basic variables for all bots"""
-        self.ship = ship
-        self.location = initial_location
-        self.detection_radius = detection_radius
-        self.total_actions = 0
-
-    def __init__(self, ship, initial_location, detection_radius, alpha):
+    def __init__(self, ship, initial_location, detection_radius, alpha = 0):
         """Initializes basic variables for all bots"""
         self.ship = ship
         self.location = initial_location

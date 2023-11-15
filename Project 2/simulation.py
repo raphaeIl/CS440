@@ -7,7 +7,7 @@ class Simulation:
 
     def __init__(self, ship_size, detection_radius, alpha, bot_number, ship_layout_file = None, render_debug_logs = False):
         self.running = True
-        self.FPS = 100000000000
+        self.FPS = 100000
         self.render_debug_logs = render_debug_logs
         self.time_elapsed = 0
 
@@ -28,9 +28,9 @@ class Simulation:
                 self.stop(result)
                 return result
             
-            if self.time_elapsed > 60:  # 10s timeout incase something happens
-                self.stop(result)
-                return TaskStatus.FAIL
+            # if self.time_elapsed > 60:  # 10s timeout incase something happens
+                # self.stop(result)
+                # return TaskStatus.FAIL
 
             self.render()
 
