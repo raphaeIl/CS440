@@ -1,0 +1,57 @@
+Bot 1
+Average Action (k={1}, a={0}, runs={10}):  1078.4  per run
+Average Action (k={2}, a={0}, runs={10}):  631.3  per run
+Average Action (k={3}, a={0}, runs={10}):  559.7  per run
+Average Action (k={4}, a={0}, runs={10}):  389.0  per run
+Average Action (k={5}, a={0}, runs={10}):  357.9  per run
+
+Bot 2
+Average Action (k=1, a=0, runs=10):  1334.8  per run
+Average Action (k=2, a=0, runs=10):  846.7  per run
+Average Action (k=3, a=0, runs=10):  374.8  per run
+Average Action (k=3, a=0, runs=10):  374.8  per run
+Average Action (k=5, a=0, runs=10):  212.5  per run
+
+Bot 3
+Average Action (k=5, a=0.1, runs=10):  339.3  per run
+Average Action (k=5, a=0.15, runs=10):  312.9  per run
+Average Action (k=5, a=0.2, runs=10):  122.3  per run
+Average Action (k=5, a=0.25, runs=10):  181.9  per run
+Average Action (k=5, a=0.3, runs=10):  344.5  per run
+Average Action (k=5, a=0.4, runs=10):  380.5  per run
+Average Action (k=5, a=0.45, runs=10):  290.0  per run
+Average Action (k=5, a=0.5, runs=10):  839.2  per run
+
+Bot 4
+Average Action (k=5, a=0.1, runs=10):  413.4  per run
+Average Action (k=5, a=0.15, runs=10):  157.1  per run
+Average Action (k=5, a=0.25, runs=10):  375.9  per run
+Average Action (k=5, a=0.3, runs=10):  429.1  per run
+Average Action (k=5, a=0.35, runs=10):  738.7  per run
+Average Action (k=5, a=0.4, runs=10):  1537.7  per run
+Average Action (k=5, a=0.45, runs=10):  800.4  per run
+Average Action (k=5, a=0.5, runs=10):  1348.5  per run
+
+Bot 5
+Average Action (k=1, a=0, runs=10):  2021.7  per run
+Average Action (k=2, a=0, runs=10):  1408.5  per run
+Average Action (k=3, a=0, runs=10):  847.3  per run
+Average Action (k=4, a=0, runs=10):  566.2  per run
+Average Action (k=5, a=0, runs=10):  507.7  per run
+
+Bot 6
+Average Action (k=1, a=0, runs=10):  2359.8  per run
+Average Action (k=2, a=0, runs=10):  868.3  per run
+Average Action (k=3, a=0, runs=10):  574.7  per run
+Average Action (k=4, a=0, runs=10):  559.1  per run
+Average Action (k=5, a=0, runs=10):  404.1  per run
+
+Bot 7
+Average Action (k=5, a=0.1, runs=10):  502.0  per run 
+Average Action (k=5, a=0.15, runs=10):  397.4  per run   
+Average Action (k=5, a=0.2, runs=10):  421.2  per run   
+Average Action (k=5, a=0.25, runs=10):  322.0  per run
+Average Action (k=5, a=0.3, runs=10):  236.0  per run
+Average Action (k=5, a=0.35, runs=10):  789.0  per run
+Average Action (k=5, a=0.4, runs=10):  1573.5  per run
+Average Action (k=5, a=0.5, runs=10):  826.5  per run
