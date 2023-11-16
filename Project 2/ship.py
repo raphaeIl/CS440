@@ -18,7 +18,6 @@ class Ship:
         self.detection_radius = detection_radius
         self.ship_grid = np.zeros((D, D), np.int8)
         self.opened_cells = set([])
-        print(load_from_file)
 
         if load_from_file == None:        
             self.init_layout()
@@ -59,7 +58,7 @@ class Ship:
                 
     def render(self):
         self.display()
-        # self.bot.render_probability_grid()
+        self.bot.render_probability_grid()
 
     def init_layout(self):
         print("Generating Ship Layout... Please wait...   ")

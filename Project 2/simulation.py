@@ -28,9 +28,9 @@ class Simulation:
                 self.stop(result)
                 return result
             
-            # if self.time_elapsed > 60:  # 10s timeout incase something happens
-                # self.stop(result)
-                # return TaskStatus.FAIL
+            if self.time_elapsed > 600:  # 10s timeout incase something happens
+                self.stop(result)
+                return TaskStatus.FAIL
 
             self.render()
 

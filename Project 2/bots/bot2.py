@@ -14,7 +14,6 @@ class Bot2(Bot):
 
         # all cells might have leak at start
         self.leak_probability_grid = np.ones((self.ship.ship_size, self.ship.ship_size), np.int8)
-        self.current_path = deque()
         # walls can not have leaks
         for y in range(0, self.ship.ship_size):
             for x in range(0, self.ship.ship_size):

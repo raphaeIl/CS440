@@ -1,15 +1,17 @@
 from cell_state import CellState
 from task_status import TaskStatus
+from bot import Bot
 
-from collections import deque
 import numpy as np
 import random
 import math
-import heapq
-
-from bot import Bot
 
 class Bot3(Bot):
+    """
+    Probabilistic Leak Detectors
+    For some Probabilistic Leak Detectors: Bot 3, 4, 7
+    I also used a probability matrix (leak_probability_grid), but instead of binary values, it contains actual probabilities of containing and leak for each cell ranging from 0 to 1
+    """
 
     def start(self):
         super().start()

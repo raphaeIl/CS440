@@ -18,17 +18,17 @@ class Bot(ABC):
     
     @abstractmethod
     def start(self):
-        pass
         """Initialization method for each bot, ran before the main game loop begins"""
+        pass
     
     @abstractmethod
     def update(self):
-        pass
         """Update values, ran once per frame during game loop"""
+        pass
 
     def move(self, destination):
         """Utility method for moving a bot"""
-        self.total_actions += 1
+        self.total_actions += 1 # total actions are added by 1 every time a move happens
 
         self.ship.ship_grid[self.location] = CellState.WALKED_PATH
 
@@ -37,7 +37,7 @@ class Bot(ABC):
 
     def sense(self):
         """Sense and update knowledge, Default Implementation"""
-        self.total_actions += 1
+        self.total_actions += 1 # total actions are also added by 1 here everytime a sense happens
 
         has_sensed_leak = self.ship.is_leak_in_area(self.location, self.detection_radius)
         

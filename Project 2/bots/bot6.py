@@ -82,14 +82,13 @@ class Bot6(Bot):
         # Define a search radius based on the ship size or other criteria
         search_radius = min(10, self.ship.ship_size // 2)
 
-        # Get nearby cells with high probability
+        # get nearby cells with high probability
         nearby_high_prob_cells = self.get_nearby_high_prob_cells(search_radius)
 
-        # If no nearby high probability cells, default to previous method
+        # If no nearby high probability cells, default to previous method 
         if not nearby_high_prob_cells:
             return self.find_nearest_cell_old()
 
-        # Use A* or another efficient pathfinding algorithm
         paths_and_distances = [(cell, self.find_shortest_path(self.location, cell)) for cell in nearby_high_prob_cells]
         min_distance_cell, _ = min(paths_and_distances, key=lambda x: len(x[1]))
 
@@ -157,8 +156,6 @@ class Bot6(Bot):
                         cluster_max_probability = self.leak_probability_grid[y, x]
 
         cluster_max_probability_cells = []
-
-        print(cluster_max_probability, cluster_max_probability_cells)
 
         for y in range(start_y, end_y):
             for x in range(start_x, end_x):

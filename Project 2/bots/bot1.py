@@ -1,20 +1,25 @@
 from cell_state import CellState
 from task_status import TaskStatus
-
-from collections import deque
-import numpy as np
-
 from bot import Bot
 
+import numpy as np
+
 class Bot1(Bot):
+    """
+    Deterministic Leak Detectors
+    For all Deterministic Leak Detectors: Bot 1, 2, 5 and 6
+    I used a probability matrix (leak_probability_grid) which is a 2d array containing binary values, either P_NO_LEAK (0, meaning a cell can not possibly contain leak) or P_MIGHT_CONTAIN_LEAK (1, meaning a cell might contain leak) 
+    
+    All bot classes are also children of a base Bot class which contains the structure for bots, for instance functions and variables
+    """
 
     def start(self):
         super().start()
 
-        # all cells might have leak at start
+        # all cells might have leak at start (all 1s)
         self.leak_probability_grid = np.ones((self.ship.ship_size, self.ship.ship_size), np.int8)
 
-        # walls can not have leaks
+        # walls can not have leaks (set P of all walls to 0)
         for y in range(0, self.ship.ship_size):
             for x in range(0, self.ship.ship_size):
                 if (y, x) not in self.ship.opened_cells:

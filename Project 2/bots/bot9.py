@@ -5,31 +5,9 @@ from collections import deque
 import numpy as np
 import random
 import math
-import heapq
 from bot import Bot
-class Bot8(Bot):
-    """
-    For the Probabilistic Leak Detectors: Bot 8 and 9
-    I used a dictionary to represent the knowledge base, it contains all unique possible combination of pairs of opened_cells as the keys (no duplicates), 
-        where each key is in the format of: [(cell_a_y, cell_a_x), (pair_b_y, pair_b_x)]
-          and each value is the probability of both pair_a and pair_b containing the leak = P(leak in j AND leak in k)
+class Bot9(Bot):
 
-    The length of the dict is: length = n Choose 2 =(n * (n - 1)) / 2, where n is the length of the number of opened_cells, not the total number of cells in the ship
-    
-    For instance, for a 2x2 ship (all open, n = 4), starting values for my dictionary would look like this (length = 4 * 3 / 2):
-    {   
-            key           :     value
-        "[(0, 0), (0, 1)]":     1 / 6    
-        "[(0, 0), (0, 1)]":     1 / 6       
-        "[(0, 0), (1, 1)]":     1 / 6    
-        "[(0, 1), (1, 0)]":     1 / 6    
-        "[(0, 1), (1, 1)]":     1 / 6    
-        "[(1, 0), (1, 1)]":     1 / 6    
-        
-    }
-
-    I'm not really sure but I think this might be a bit easier than using for instance a higher dimension matrix to represent the pairs of probabilities
-    """
     def start(self):
         super().start()
 
@@ -46,15 +24,8 @@ class Bot8(Bot):
             for b in range(a + 1, len(self.ship.opened_cells)):
                 self.leak_probability_grid[self.opened_cells_list[a], self.opened_cells_list[b]] = 1 / pairs_count
 
-        print(len(self.leak_probability_grid))
-        print(pairs_count)
-
-        # for key in self.leak_probability_grid:
-            # print(key, self.leak_probability_grid[key])
-
     def sense(self): # sense and update knownledge
         # beep or not
-
         p_leak1 = 0
         p_leak2 = 0
 
@@ -81,7 +52,6 @@ class Bot8(Bot):
                                 * math.pow(math.e, -self.alpha * (len(self.find_shortest_path(self.location, key[1])) - 1))
 
                 beep_in_i += prob
-                print(beep_in_i)
 
         # For beep in i:
         # P(leak in j AND leak in k | beep in i)
@@ -113,6 +83,11 @@ class Bot8(Bot):
                 self.leak_probability_grid[key] /= (1 - p)
         print("update, total sum of p: ", 1 - p)
 
+        # for y in range(0, self.ship.ship_size):
+            # for x in range(0, self.ship.ship_size):
+                # if (y, x) in self.ship.opened_cells and (y, x) != self.location:
+                    # self.leak_probability_grid[y, x] /= (1 - p)
+        
     def update(self):
         super().update()
 
