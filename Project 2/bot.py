@@ -48,7 +48,6 @@ class Bot(ABC):
             Using A* for all bots to make it fair, since we focusing on optimizing probability algorithms rather than searching ones
             Returns the path in a list, Use len(path) if you only need the shortest distance
         """
-        
         heapQueue = [(0, start, [])]  # Priority queue: (f, current_position, path)
         visited = set()
 

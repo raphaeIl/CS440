@@ -9,6 +9,7 @@ from bots.bot5 import Bot5
 from bots.bot6 import Bot6
 from bots.bot7 import Bot7
 from bots.bot8 import Bot8
+from bots.bot9 import Bot9
 from cell_state import CellState
 from task_status import TaskStatus
 
@@ -45,6 +46,8 @@ class Ship:
             self.bot = Bot7(self, self.bot_location, self.detection_radius, alpha)
         elif bot_number == 8:
             self.bot = Bot8(self, self.bot_location, self.detection_radius, alpha)
+        elif bot_number == 9:
+            self.bot = Bot9(self, self.bot_location, self.detection_radius, alpha)
         
         print("Running Simulation....")
 
@@ -58,7 +61,7 @@ class Ship:
                 
     def render(self):
         self.display()
-        self.bot.render_probability_grid()
+        # self.bot.render_probability_grid()
 
     def init_layout(self):
         print("Generating Ship Layout... Please wait...   ")

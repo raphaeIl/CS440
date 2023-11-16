@@ -14,9 +14,9 @@ class Bot8(Bot):
         where each key is in the format of: [(cell_a_y, cell_a_x), (pair_b_y, pair_b_x)]
           and each value is the probability of both pair_a and pair_b containing the leak = P(leak in j AND leak in k)
 
-    The length of the dict is: length = n Choose 2 =(n * (n - 1)) / 2, where n is the length of the number of opened_cells, not the total number of cells in the ship
+    The length of the dict is: length = n Choose 2 = (n * (n - 1)) / 2, where n is the length of the number of opened_cells, not the total number of cells in the ship
     
-    For instance, for a 2x2 ship (all open, n = 4), starting values for my dictionary would look like this (length = 4 * 3 / 2):
+    For example, for a 2x2 ship (all open, n = 4), starting values for my dictionary would look like this (length = 4 * 3 / 2):
     {   
             key           :     value
         "[(0, 0), (0, 1)]":     1 / 6    
@@ -46,13 +46,9 @@ class Bot8(Bot):
             for b in range(a + 1, len(self.ship.opened_cells)):
                 self.leak_probability_grid[self.opened_cells_list[a], self.opened_cells_list[b]] = 1 / pairs_count
 
-        print(len(self.leak_probability_grid))
-        print(pairs_count)
-
-        # for key in self.leak_probability_grid:
-            # print(key, self.leak_probability_grid[key])
-
     def sense(self): # sense and update knownledge
+        super().sense()
+    
         # beep or not
 
         p_leak1 = 0
@@ -70,36 +66,31 @@ class Bot8(Bot):
         # P(beep in i)
         beep_in_i = 0
 
-        for y in range(self.ship.ship_size):
-            print("|", end='')
-            for x in range(self.ship.ship_size):
-                prob = 0 # P(k)
+        for key in self.leak_probability_grid:
+            j_does_cause_a_beep = (1 - math.pow(math.e, -self.alpha * ((len(self.find_shortest_path(self.location, key[0]))) - 1)))
+            k_does_cause_a_beep = (1 - math.pow(math.e, -self.alpha * ((len(self.find_shortest_path(self.location, key[1]))) - 1)))
+                
+            beep_in_i += self.leak_probability_grid[key] * j_does_cause_a_beep * k_does_cause_a_beep
 
-                for key in self.leak_probability_grid:
-                    if key[0] == (y, x):
-                        prob += self.leak_probability_grid[key] * math.pow(math.e, -self.alpha * (len(self.find_shortest_path(self.location, key[0])) - 1)) \
-                                * math.pow(math.e, -self.alpha * (len(self.find_shortest_path(self.location, key[1])) - 1))
-
-                beep_in_i += prob
-                print(beep_in_i)
-
-        # For beep in i:
+        # For beep in i: (equations in write-up)
         # P(leak in j AND leak in k | beep in i)
 
         # No beep in i:
         # 1 - P(leak in j AND leak in k | beep in i)
+        for key in self.leak_probability_grid:
+            cell_j, cell_k = key[0], key[1]
 
-        for a in range(0, len(self.ship.opened_cells)):
-            for b in range(a + 1, len(self.ship.opened_cells)):
-                cell_j, cell_k = self.opened_cells_list[a], self.opened_cells_list[b]
+            if cell_j == self.location or cell_k == self.location:
+                continue
 
-                if cell_j == self.location or cell_k == self.location:
-                    continue
+            j_does_cause_a_beep = (1 - math.pow(math.e, -self.alpha * ((len(self.find_shortest_path(self.location, cell_j))) - 1)))
+            k_does_cause_a_beep = (1 - math.pow(math.e, -self.alpha * ((len(self.find_shortest_path(self.location, cell_k))) - 1)))
+            p_peak_in_j_and_leak_in_k = (self.leak_probability_grid[cell_j, cell_k] * (1 - (j_does_cause_a_beep) * (k_does_cause_a_beep))) / beep_in_i
 
-                if random.random() <= p_leak1 or random.random() <= p_leak2: # beep 
-                    self.leak_probability_grid[cell_j, cell_k] *= 1 - (1 - math.pow(math.e, -self.alpha * (len(self.find_shortest_path(self.location, cell_j)) - 1))) * (1 - math.pow(math.e, -self.alpha * (len(self.find_shortest_path(self.location, cell_k)) - 1)))
-                else: # no beep
-                    self.leak_probability_grid[cell_j, cell_k] *= (1 - math.pow(math.e, -self.alpha * (len(self.find_shortest_path(self.location, cell_j)) - 1))) * (1 - math.pow(math.e, -self.alpha * (len(self.find_shortest_path(self.location, cell_k)) - 1)))
+            if random.random() <= p_leak1 or random.random() <= p_leak2: # beep 
+                self.leak_probability_grid[cell_j, cell_k] = p_peak_in_j_and_leak_in_k
+            else: # no beep
+                self.leak_probability_grid[cell_j, cell_k] = 1 - p_peak_in_j_and_leak_in_k 
 
     def bot_enters_cell_probability_update(self):
         p = 0 # find the p of the cell that we entered, which is sum (cell we entered, pairs of that), set all to 0 and normalize rest
@@ -111,7 +102,7 @@ class Bot8(Bot):
         for key in self.leak_probability_grid:
             if key[0] != self.location:
                 self.leak_probability_grid[key] /= (1 - p)
-        print("update, total sum of p: ", 1 - p)
+        # print("update, total sum of p: ", 1 - p)
 
     def update(self):
         super().update()
@@ -146,29 +137,17 @@ class Bot8(Bot):
         max_probability = -999999
         max_probability_cells = [] # all cells with the highest probability
 
-        for y in range(self.ship.ship_size):
-            for x in range(self.ship.ship_size):
-                p = 0
+        for key in self.leak_probability_grid:
+            if self.leak_probability_grid[key] > max_probability:
+                max_probability = self.leak_probability_grid[key]
 
-                for key in self.leak_probability_grid:
-                    if key[0] == (y, x):
-                        p += self.leak_probability_grid[key]
+        for key in self.leak_probability_grid:
+            if self.leak_probability_grid[key] > max_probability:
+                max_probability = self.leak_probability_grid[key]
 
-                if p > max_probability:
-                    max_probability = p
+            if self.leak_probability_grid[key] == max_probability:
+                max_probability_cells.append(key[0])
 
-        print(max_probability)
-
-        for y in range(self.ship.ship_size):
-            for x in range(self.ship.ship_size):
-                p = 0
-
-                for key in self.leak_probability_grid:
-                    if key[0] == (y, x):
-                        p += self.leak_probability_grid[key]
-
-                if p == max_probability:
-                    max_probability_cells.append((y, x))
 
         # breaking ties by distance
         distances = [len(self.find_shortest_path(self.location, cell)) for cell in max_probability_cells]
@@ -179,7 +158,6 @@ class Bot8(Bot):
             if distances[i] == min_distance:
                 closest_cells.append(max_probability_cells[i])
         
-        print(min_distance, closest_cells)
         return random.choice(closest_cells) # chose one within all the cells with same distance
 
 

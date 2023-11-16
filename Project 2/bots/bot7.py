@@ -26,6 +26,7 @@ class Bot7(Bot):
                     self.leak_probability_grid[y, x] = 1 / len(self.ship.opened_cells)
 
     def sense(self): # sense and update knownledge
+        sensed_leak = super().sense()
         # beep or not
 
         p_leak1 = 0

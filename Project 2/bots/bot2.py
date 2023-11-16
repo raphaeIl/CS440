@@ -69,8 +69,17 @@ class Bot2(Bot):
         return TaskStatus.ONGOING, -1
     
     def find_nearest_cell(self):
-        # Define a search radius based on the ship size or other criteria
-        search_radius = min(10, self.ship.ship_size // 2)
+        """
+        For bot 2, 4, 6 and 9, I used a similar strategy to find the "best cell" to move to whenever the bot when nessary based on the probabilitys in the knowledge base, for consistency, all bots will be using the A* search algorithm, and the difference is just which cell we pick.
+        
+        The best strategy that I was able to find bascially finds high-probabilties clusters instead of single cells and choose one cell in that cluster as the best cell to move to next. More explained in write-up
+
+        instead of moving to the highest probability and nearest single cell that might contain the leak, 
+        I will first try to see if there are any really high outliers probabilities 
+        
+        """
+        # search radius
+        search_radius = 10
 
         # Get nearby cells with high probability
         nearby_high_prob_cells = self.get_nearby_high_prob_cells(search_radius)
