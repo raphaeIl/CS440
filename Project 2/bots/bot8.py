@@ -1,11 +1,9 @@
 from cell_state import CellState
 from task_status import TaskStatus
 
-from collections import deque
-import numpy as np
 import random
 import math
-import heapq
+
 from bot import Bot
 class Bot8(Bot):
     """
@@ -49,8 +47,6 @@ class Bot8(Bot):
     def sense(self): # sense and update knownledge
         super().sense()
     
-        # beep or not
-
         p_leak1 = 0
         p_leak2 = 0
 

@@ -128,9 +128,7 @@ class Ship:
             initial_leak_cell2 = random.choice(opened_cells_outside_detection_square)
             self.ship_grid[initial_leak_cell2] = CellState.LEAK
 
-        return initial_bot_cell, initial_leak_cell, initial_leak_cell2
-
-    
+        return initial_bot_cell, initial_leak_cell, initial_leak_cell2 
 
     def open_cell(self, cell):
         # print("Opening cell: ", cell)

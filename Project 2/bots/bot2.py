@@ -1,9 +1,7 @@
 from cell_state import CellState
 from task_status import TaskStatus
 
-from collections import deque
 import numpy as np
-import random
 
 from bot import Bot
 
@@ -73,10 +71,6 @@ class Bot2(Bot):
         For bot 2, 4, 6 and 9, I used a similar strategy to find the "best cell" to move to whenever the bot when nessary based on the probabilitys in the knowledge base, for consistency, all bots will be using the A* search algorithm, and the difference is just which cell we pick.
         
         The best strategy that I was able to find bascially finds high-probabilties clusters instead of single cells and choose one cell in that cluster as the best cell to move to next. More explained in write-up
-
-        instead of moving to the highest probability and nearest single cell that might contain the leak, 
-        I will first try to see if there are any really high outliers probabilities 
-        
         """
         # search radius
         search_radius = 10
@@ -168,23 +162,23 @@ class Bot2(Bot):
         return final_min_distance_cell
     
     def render_probability_grid(self):
-            for x in range(len(self.leak_probability_grid[0])):
-                if x == 0:
-                    print(" __", end='')
-                else:
-                    print("__", end='')
+        for x in range(len(self.leak_probability_grid[0])):
+            if x == 0:
+                print(" __", end='')
+            else:
+                print("__", end='')
+
+        print()
+        for y in range(len(self.leak_probability_grid[0])):
+            print("|", end='')
+            for x in range(len(self.leak_probability_grid[1])):
+                current_cell_display = CellState.to_probability_display_string[self.leak_probability_grid[y, x]]
+
+
+
+                if x == len(self.leak_probability_grid[1]) - 1:
+                    current_cell_display += "|"
+
+                print(current_cell_display, end="")
 
             print()
-            for y in range(len(self.leak_probability_grid[0])):
-                print("|", end='')
-                for x in range(len(self.leak_probability_grid[1])):
-                    current_cell_display = CellState.to_probability_display_string[self.leak_probability_grid[y, x]]
-
-
-
-                    if x == len(self.leak_probability_grid[1]) - 1:
-                        current_cell_display += "|"
-
-                    print(current_cell_display, end="")
-
-                print()

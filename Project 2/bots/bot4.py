@@ -82,17 +82,13 @@ class Bot4(Bot):
         return TaskStatus.ONGOING, -1
 
     def find_highest_probability_cell(self):
-        # Define a search radius based on the ship size or other criteria
-        search_radius = min(10, self.ship.ship_size // 2)
+        search_radius = 10
 
-        # Get nearby cells with high probability
         nearby_high_prob_cells = self.get_nearby_high_prob_cells(search_radius)
 
-        # If no nearby high probability cells, default to previous method
         if not nearby_high_prob_cells:
             return self.find_highest_probability_cell_old()
 
-        # Use A* or another efficient pathfinding algorithm
         paths_and_distances = [(cell, self.find_shortest_path(self.location, cell)) for cell in nearby_high_prob_cells]
         min_distance_cell, _ = min(paths_and_distances, key=lambda x: len(x[1]))
 
@@ -110,6 +106,7 @@ class Bot4(Bot):
                         nearby_cells.append((new_y, new_x))
 
         return nearby_cells
+    
     # find the cell that has the highest probability of containing the leak
     def find_highest_probability_cell_old(self):
         # instead of moving to the nearest single cell that might contain the leak, I will move to the area that has the most cells that might contain the leak

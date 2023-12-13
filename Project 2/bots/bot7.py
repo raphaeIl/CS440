@@ -1,11 +1,10 @@
 from cell_state import CellState
 from task_status import TaskStatus
 
-from collections import deque
 import numpy as np
 import random
 import math
-import heapq
+
 from bot import Bot
 class Bot7(Bot):
 
